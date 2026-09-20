@@ -1,0 +1,4 @@
+Gardening category photograph sourced from Unsplash.
+Original: https://images.unsplash.com/photo-1416879595882-3373a0480b5b
+Downloaded at 1200px, JPEG quality 80 for local hosting.
+License: https://unsplash.com/license
