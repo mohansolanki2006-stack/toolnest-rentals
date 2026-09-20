@@ -31,7 +31,682 @@ const equipmentNames: Record<string,string[]> = {
 };
 const categoryBrands: Record<string,string[]> = {"power-tools":["Bosch","Makita","Hilti"],construction:["Wacker","Honda","JCB"],gardening:["Honda","Stihl","Husqvarna"],cleaning:["Kärcher","Nilfisk","Taski"],welding:["ESAB","Ador","Rilon"],electrical:["Fluke","Megger","Bosch"],plumbing:["Ridgid","Rothenberger","Kirloskar"],painting:["Graco","Wagner","Bosch"],woodworking:["DeWalt","Makita","Bosch"],other:["Genie","Kärcher","Ridgid"]};
 function exactToolImage(name:string,index:number){ const host=["tse1","tse2","tse3"][index]; const query=encodeURIComponent(`${name} professional machine product`); return `https://${host}.mm.bing.net/th?q=${query}&w=900&h=600&c=7&rs=1&p=0`; }
-function toolsFor(sub:string,category:Category): Tool[] { const names=equipmentNames[sub]||[`${sub} Machine`,`Professional ${sub} System`,`Heavy-Duty ${sub} Equipment`]; const prices=category.slug==="construction"?[650,850,1100]:category.slug==="electrical"?[400,600,900]:[350,500,750]; return names.map((name,i)=>({name,brand:name.split(" ")[0]||categoryBrands[category.slug]?.[i]||"Professional",model:`TN-${category.slug.slice(0,3).toUpperCase()}-${101+i}`,spec:`Professional-grade ${sub.toLowerCase()} equipment`,price:prices[i],deposit:prices[i]*3,shops:4-i,image:exactToolImage(name,i)})); }
+// Indicative equipment-only daily tariffs, not verified Mumbai shop quotes.
+// Reviewed 2026-09-20. Each tuple is [daily INR, refundable deposit INR].
+// Ajax benchmark: https://www.kkearthmovers.com/concrete-mixer-rental-service.html
+// Argo 2500 comparator: https://samarthinfratech.com/ajax-fiori-on-rent/
+// Other rates and all deposits are planning estimates requiring supplier confirmation.
+// No monthly-to-daily conversion or claimed live shop-specific pricing.
+const rentalTariffs:Record<string,[number,number][]>={
+  "Drilling & Breaking": [
+    [
+      800,
+      5000
+    ],
+    [
+      500,
+      3000
+    ],
+    [
+      2200,
+      15000
+    ]
+  ],
+  "Cutting & Sawing": [
+    [
+      500,
+      3000
+    ],
+    [
+      900,
+      6000
+    ],
+    [
+      650,
+      4000
+    ]
+  ],
+  "Grinding & Sanding": [
+    [
+      350,
+      2000
+    ],
+    [
+      600,
+      4000
+    ],
+    [
+      1800,
+      12000
+    ]
+  ],
+  "Woodworking": [
+    [
+      550,
+      3000
+    ],
+    [
+      600,
+      4000
+    ],
+    [
+      700,
+      5000
+    ]
+  ],
+  "Heavy-Duty Power Tools": [
+    [
+      2500,
+      20000
+    ],
+    [
+      1800,
+      12000
+    ],
+    [
+      600,
+      4000
+    ]
+  ],
+  "Concrete Equipment": [
+    [
+      6500,
+      30000
+    ],
+    [
+      700,
+      4000
+    ],
+    [
+      3500,
+      20000
+    ]
+  ],
+  "Compaction Equipment": [
+    [
+      1800,
+      10000
+    ],
+    [
+      2200,
+      12000
+    ],
+    [
+      4500,
+      25000
+    ]
+  ],
+  "Cutting Equipment": [
+    [
+      2500,
+      15000
+    ],
+    [
+      1800,
+      10000
+    ],
+    [
+      12000,
+      50000
+    ]
+  ],
+  "Lifting Equipment": [
+    [
+      2500,
+      15000
+    ],
+    [
+      1500,
+      10000
+    ],
+    [
+      1200,
+      8000
+    ]
+  ],
+  "Site Equipment": [
+    [
+      1800,
+      10000
+    ],
+    [
+      2800,
+      15000
+    ],
+    [
+      1800,
+      10000
+    ]
+  ],
+  "Lawn Equipment": [
+    [
+      1200,
+      6000
+    ],
+    [
+      700,
+      4000
+    ],
+    [
+      4500,
+      25000
+    ]
+  ],
+  "Tree Cutting": [
+    [
+      1000,
+      6000
+    ],
+    [
+      1200,
+      8000
+    ],
+    [
+      650,
+      4000
+    ]
+  ],
+  "Hedge & Garden Cutting": [
+    [
+      600,
+      4000
+    ],
+    [
+      900,
+      5000
+    ],
+    [
+      550,
+      3000
+    ]
+  ],
+  "Spraying Equipment": [
+    [
+      900,
+      5000
+    ],
+    [
+      250,
+      1500
+    ],
+    [
+      1200,
+      7000
+    ]
+  ],
+  "Soil & Digging Equipment": [
+    [
+      1500,
+      8000
+    ],
+    [
+      2200,
+      12000
+    ],
+    [
+      6500,
+      30000
+    ]
+  ],
+  "Pressure Washers": [
+    [
+      1300,
+      7000
+    ],
+    [
+      900,
+      5000
+    ],
+    [
+      2500,
+      15000
+    ]
+  ],
+  "Industrial Vacuums": [
+    [
+      700,
+      4000
+    ],
+    [
+      900,
+      6000
+    ],
+    [
+      1800,
+      10000
+    ]
+  ],
+  "Floor Cleaning Machines": [
+    [
+      2800,
+      15000
+    ],
+    [
+      2500,
+      15000
+    ],
+    [
+      6500,
+      30000
+    ]
+  ],
+  "Floor Polishers": [
+    [
+      1200,
+      7000
+    ],
+    [
+      1400,
+      8000
+    ],
+    [
+      1800,
+      10000
+    ]
+  ],
+  "Welding Machines": [
+    [
+      700,
+      5000
+    ],
+    [
+      1800,
+      12000
+    ],
+    [
+      1600,
+      10000
+    ]
+  ],
+  "Cutting Machines": [
+    [
+      2200,
+      15000
+    ],
+    [
+      650,
+      5000
+    ],
+    [
+      10000,
+      50000
+    ]
+  ],
+  "Air Compressors": [
+    [
+      1200,
+      8000
+    ],
+    [
+      4500,
+      25000
+    ],
+    [
+      4000,
+      25000
+    ]
+  ],
+  "Fabrication Equipment": [
+    [
+      1200,
+      8000
+    ],
+    [
+      1800,
+      12000
+    ],
+    [
+      450,
+      3000
+    ]
+  ],
+  "Electrical Testers": [
+    [
+      450,
+      5000
+    ],
+    [
+      1200,
+      15000
+    ],
+    [
+      500,
+      5000
+    ]
+  ],
+  "Cable Testing": [
+    [
+      4500,
+      40000
+    ],
+    [
+      8500,
+      50000
+    ],
+    [
+      1800,
+      20000
+    ]
+  ],
+  "Laser Measurement": [
+    [
+      350,
+      3000
+    ],
+    [
+      1500,
+      15000
+    ],
+    [
+      1000,
+      10000
+    ]
+  ],
+  "Professional Measuring Equipment": [
+    [
+      2500,
+      30000
+    ],
+    [
+      1200,
+      15000
+    ],
+    [
+      3000,
+      25000
+    ]
+  ],
+  "Pipe Cutting": [
+    [
+      450,
+      3000
+    ],
+    [
+      750,
+      5000
+    ],
+    [
+      4500,
+      30000
+    ]
+  ],
+  "Drain Cleaning": [
+    [
+      1800,
+      12000
+    ],
+    [
+      4500,
+      25000
+    ],
+    [
+      1000,
+      6000
+    ]
+  ],
+  "Water Pumps": [
+    [
+      1200,
+      7000
+    ],
+    [
+      1300,
+      8000
+    ],
+    [
+      1800,
+      10000
+    ]
+  ],
+  "Pipe Threading": [
+    [
+      2200,
+      15000
+    ],
+    [
+      2000,
+      15000
+    ],
+    [
+      2800,
+      20000
+    ]
+  ],
+  "Professional Plumbing Machines": [
+    [
+      1200,
+      8000
+    ],
+    [
+      4500,
+      25000
+    ],
+    [
+      2800,
+      20000
+    ]
+  ],
+  "Paint Sprayers": [
+    [
+      600,
+      4000
+    ],
+    [
+      900,
+      6000
+    ],
+    [
+      1400,
+      10000
+    ]
+  ],
+  "Airless Spray Machines": [
+    [
+      2200,
+      15000
+    ],
+    [
+      1500,
+      10000
+    ],
+    [
+      2500,
+      18000
+    ]
+  ],
+  "Surface Sanders": [
+    [
+      450,
+      3000
+    ],
+    [
+      600,
+      4000
+    ],
+    [
+      900,
+      8000
+    ]
+  ],
+  "Wall Sanders": [
+    [
+      800,
+      5000
+    ],
+    [
+      1600,
+      15000
+    ],
+    [
+      1000,
+      7000
+    ]
+  ],
+  "Surface Preparation Equipment": [
+    [
+      8500,
+      40000
+    ],
+    [
+      3500,
+      20000
+    ],
+    [
+      2200,
+      15000
+    ]
+  ],
+  "Circular Saws": [
+    [
+      500,
+      3000
+    ],
+    [
+      1000,
+      8000
+    ],
+    [
+      1100,
+      8000
+    ]
+  ],
+  "Mitre Saws": [
+    [
+      1100,
+      8000
+    ],
+    [
+      1000,
+      7000
+    ],
+    [
+      1300,
+      10000
+    ]
+  ],
+  "Table Saws": [
+    [
+      1500,
+      10000
+    ],
+    [
+      1600,
+      12000
+    ],
+    [
+      1800,
+      12000
+    ]
+  ],
+  "Planers": [
+    [
+      1800,
+      12000
+    ],
+    [
+      1600,
+      10000
+    ],
+    [
+      550,
+      3000
+    ]
+  ],
+  "Routers": [
+    [
+      600,
+      4000
+    ],
+    [
+      450,
+      3000
+    ],
+    [
+      650,
+      5000
+    ]
+  ],
+  "Professional Woodworking Machines": [
+    [
+      6500,
+      30000
+    ],
+    [
+      4500,
+      25000
+    ],
+    [
+      3500,
+      20000
+    ]
+  ],
+  "Heavy-Duty Ladders": [
+    [
+      500,
+      3000
+    ],
+    [
+      650,
+      4000
+    ],
+    [
+      750,
+      5000
+    ]
+  ],
+  "Material Handling": [
+    [
+      700,
+      5000
+    ],
+    [
+      2500,
+      15000
+    ],
+    [
+      250,
+      1500
+    ]
+  ],
+  "Site Safety Equipment": [
+    [
+      600,
+      4000
+    ],
+    [
+      1000,
+      6000
+    ],
+    [
+      1200,
+      15000
+    ]
+  ],
+  "Specialised Machines": [
+    [
+      1200,
+      8000
+    ],
+    [
+      2200,
+      15000
+    ],
+    [
+      2800,
+      20000
+    ]
+  ]
+};
+function toolsFor(sub:string,category:Category):Tool[]{
+  return (equipmentNames[sub]??[]).map((name,i)=>{
+    const [price,deposit]=rentalTariffs[sub][i];
+    return {name,brand:name.split(" ")[0]||categoryBrands[category.slug]?.[i]||"Professional",
+      model:`TN-${category.slug.slice(0,3).toUpperCase()}-${101+i}`,
+      spec:name==="Ajax Concrete Mixer"?"Self-loading mixer, approximately 2–2.5 m³; transport and operator arrangement required":
+      `Professional-grade ${sub.toLowerCase()} equipment`,
+      price,deposit,shops:50,image:exactToolImage(name,i)};
+  });
+}
 const shopLocations:[string,string,string,number,number][] = [
   ["Toolnest Bhayandar Station","Bhayandar West","Station Road, Bhayandar West",19.3018,72.8517],
   ["Bhayandar Market Tools","Bhayandar West","B.P. Road, Bhayandar West",19.3074,72.8502],
@@ -89,9 +764,16 @@ const shops = shopLocations.map(([name,area,address,lat,lng],index)=>({
   distance:index===0?"0.8 km":`${Math.round(index*.9+1)} km`,
   rating:Number((4.5+(index%5)*.1).toFixed(1)),
   hours:index%3===0?"8:30 AM – 8:00 PM":index%3===1?"9:00 AM – 8:00 PM":"9:00 AM – 7:30 PM",
-  price:325+(index%6)*15,
-  deposit:1000+(index%3)*100,
+  price:0, // Location template only; attach tool pricing with quoteShop before display.
+  deposit:0,
 }));
+function quoteShop(shop:(typeof shops)[number],tool:Tool){
+  // Identical indicative base at each location until actual supplier quotes exist.
+  return {...shop,price:tool.price,deposit:tool.deposit};
+}
+function PricingNote(){
+  return <p className="mt-3 text-xs leading-5 text-slate-500">Indicative rental and refundable deposit estimates, subject to shop confirmation and exact machine capacity. Daily rate assumes up to 8 operating hours. GST, transport, fuel, operator and consumables are extra where applicable; these are not included in the displayed total. Heavy/stationary machines require delivery or on-site arrangements.</p>;
+}
 type View = "home"|"subcategories"|"tools"|"detail"|"booking"|"confirmed"|"auth"|"dashboard";
 // Keep the original day-number epoch so saved bookings retain their dates.
 const RENTAL_EPOCH=Date.UTC(2026,8,1);
@@ -154,7 +836,7 @@ function extraDemoBookings():Booking[]{
     const start=today+(status==="active"?-1-i:status==="previous"?-12-i:5+i);
     const end=start+3;
     return {id:`TN-DEMO-V2-${status}-${i+1}`,tool:toolsFor("Drilling & Breaking",categories[0])[i],shop:shops[index*10+i],start,end,pickup:"10:00 AM – 11:00 AM",days:4,status,demo:true};
-  }));
+  })).map(booking=>({...booking,shop:quoteShop(booking.shop,booking.tool)}));
 }
 
 export default function Home() {
@@ -162,7 +844,7 @@ export default function Home() {
   const [selectedCategory,setSelectedCategory]=useState(categories[0]);
   const [selectedSub,setSelectedSub]=useState("Drilling & Breaking");
   const [selectedTool,setSelectedTool]=useState<Tool>(toolsFor("Drilling & Breaking",categories[0])[0]);
-  const [selectedShop,setSelectedShop]=useState(shops[0]);
+  const [selectedShop,setSelectedShop]=useState(quoteShop(shops[0],toolsFor("Drilling & Breaking",categories[0])[0]));
   const [startDay,setStartDay]=useState<number|null>(null);
   const [endDay,setEndDay]=useState<number|null>(null);
   const [pickup,setPickup]=useState("10:00 AM – 11:00 AM");
@@ -191,6 +873,7 @@ export default function Home() {
   const [calendarError,setCalendarError]=useState("");
   useEffect(()=>{setCalendarMonth(0)},[rentalMonths[0].offset]);
   const [dashboardTab,setDashboardTab]=useState<RentalStatus>("upcoming");
+  const pricedShops=useMemo(()=>shops.map(shop=>quoteShop(shop,selectedTool)),[selectedTool]);
   const currentTools=useMemo(()=>toolsFor(selectedSub,selectedCategory),[selectedSub,selectedCategory]);
   const days=startDay&&endDay?endDay-startDay+1:0;
   const filtered=useMemo(()=>categories.filter(c=>`${c.name} ${c.description} ${c.subs.join(" ")}`.toLowerCase().includes(search.toLowerCase())),[search]);
@@ -211,7 +894,7 @@ export default function Home() {
       {id:"TN-DEMO-2",tool:toolsFor("Cutting & Sawing",categories[0])[0],shop:shops[12],start:28,end:33,pickup:"2:00 PM – 3:00 PM",days:6,status:"upcoming"},
       {id:"TN-DEMO-3",tool:toolsFor("Paint Sprayers",categories[7])[0],shop:shops[28],start:39,end:42,pickup:"11:00 AM – 12:00 PM",days:4,status:"upcoming"},
     ];
-    const initial=[...demo,...extraDemoBookings()];setBookings(initial);localStorage.setItem("toolnest-demo-bookings",JSON.stringify(initial));
+    const initial=[...demo.map(b=>({...b,shop:quoteShop(b.shop,b.tool)})),...extraDemoBookings()];setBookings(initial);localStorage.setItem("toolnest-demo-bookings",JSON.stringify(initial));
   },[]);
   const cancelBooking=(id:string)=>{
     const booking=bookings.find(b=>b.id===id);
@@ -262,23 +945,23 @@ export default function Home() {
       {menu&&<div className="grid gap-1 border-t p-4 font-semibold md:hidden">{[["Home","home"],["Categories","categories"],["About","about"],["How It Works","how"],["Contact","contact"]].map(([label,id])=><button key={id} onClick={()=>id==="home"?goHome():nav(id)} className="rounded-lg px-3 py-3 text-left hover:bg-blue-50">{label}</button>)}<button onClick={()=>{setMenu(false);setView(loggedIn?"dashboard":"auth")}} className="flex items-center gap-2 rounded-lg px-3 py-3 text-left text-blue-700 hover:bg-blue-50"><UserRound size={18}/>{loggedIn?"My Dashboard":"Login"}</button>{loggedIn&&<button onClick={()=>{setMenu(false);logout()}} className="flex items-center gap-2 rounded-lg px-3 py-3 text-left text-red-600 hover:bg-red-50"><LogOut size={18}/>Logout</button>}</div>}
     </header>
     {view==="home"&&<>
-      <section className="hero-grid overflow-hidden bg-slate-950 text-white"><div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24"><div><span className="mb-5 inline-flex rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">Professional tools. Local pickup. Fair daily prices.</span><h1 className="text-5xl font-black leading-[1.03] tracking-tight sm:text-6xl">Borrow Tools.<br/><span className="text-blue-400">Build Together.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">Rent professional equipment from trusted nearby shops without the cost of buying it for one project.</p><div className="mt-8 flex flex-wrap gap-3"><button onClick={()=>nav("categories")} className="rounded-xl bg-blue-500 px-5 py-3.5 font-bold">Find My Tool</button><button onClick={()=>nav("categories")} className="rounded-xl border border-slate-600 px-5 py-3.5 font-bold">Browse Categories</button><button onClick={()=>nav("categories")} className="flex items-center gap-2 rounded-xl border border-slate-600 px-5 py-3.5 font-bold"><LocateFixed size={18}/> Find Near Me</button></div></div><div className="rounded-3xl border border-white/10 bg-white/8 p-5 shadow-2xl backdrop-blur"><div className="rounded-2xl bg-white p-5 text-slate-900"><p className="mb-3 font-bold">What tool do you need?</p><div className="flex items-center gap-3 rounded-xl border-2 border-blue-100 bg-slate-50 px-4"><Search className="text-blue-600"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Try “wall drilling” or “Bosch”" className="h-14 min-w-0 flex-1 bg-transparent outline-none"/><button onClick={()=>nav("categories")} className="rounded-lg bg-blue-600 px-4 py-2 font-bold text-white">Search</button></div><div className="mt-5 grid grid-cols-3 gap-3 text-center"><Stat n="10" label="Categories"/><Stat n="50" label="Local shops"/><Stat n="₹325" label="From / day"/></div></div></div></div></section>
+      <section className="hero-grid overflow-hidden bg-slate-950 text-white"><div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24"><div><span className="mb-5 inline-flex rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">Professional tools. Local pickup. Fair daily prices.</span><h1 className="text-5xl font-black leading-[1.03] tracking-tight sm:text-6xl">Borrow Tools.<br/><span className="text-blue-400">Build Together.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">Rent professional equipment from trusted nearby shops without the cost of buying it for one project.</p><div className="mt-8 flex flex-wrap gap-3"><button onClick={()=>nav("categories")} className="rounded-xl bg-blue-500 px-5 py-3.5 font-bold">Find My Tool</button><button onClick={()=>nav("categories")} className="rounded-xl border border-slate-600 px-5 py-3.5 font-bold">Browse Categories</button><button onClick={()=>nav("categories")} className="flex items-center gap-2 rounded-xl border border-slate-600 px-5 py-3.5 font-bold"><LocateFixed size={18}/> Find Near Me</button></div></div><div className="rounded-3xl border border-white/10 bg-white/8 p-5 shadow-2xl backdrop-blur"><div className="rounded-2xl bg-white p-5 text-slate-900"><p className="mb-3 font-bold">What tool do you need?</p><div className="flex items-center gap-3 rounded-xl border-2 border-blue-100 bg-slate-50 px-4"><Search className="text-blue-600"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Try “wall drilling” or “Bosch”" className="h-14 min-w-0 flex-1 bg-transparent outline-none"/><button onClick={()=>nav("categories")} className="rounded-lg bg-blue-600 px-4 py-2 font-bold text-white">Search</button></div><div className="mt-5 grid grid-cols-3 gap-3 text-center"><Stat n="10" label="Categories"/><Stat n="50" label="Local shops"/><Stat n="₹250" label="Estimated from / day"/></div></div></div></div></section>
       <section id="categories" className="scroll-mt-24 py-18"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="mb-9 flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><p className="eyebrow">EQUIPMENT DIRECTORY</p><h2 className="section-title">Browse by Category</h2><p className="mt-2 text-slate-600">Select a category to view professional tool options and local availability.</p></div><span className="text-sm font-semibold text-slate-500">{filtered.length} categories</span></div><div className="grid gap-7 md:grid-cols-2">{filtered.map(c=><button key={c.slug} onClick={()=>{setSelectedCategory(c);setView("subcategories");scrollTo(0,0)}} className="category-card group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><div className="overflow-hidden"><img src={c.image} alt={c.name} className="h-[260px] w-full object-cover transition duration-300 group-hover:scale-[1.04]"/></div><div className="flex items-center justify-between gap-5 p-6"><div><h3 className="text-xl font-extrabold">{c.name}</h3><p className="mt-1.5 text-[15px] leading-6 text-slate-600">{c.description}</p></div><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-700"><ArrowRight size={20}/></span></div></button>)}</div></div></section>
       <section id="about" className="scroll-mt-20 bg-slate-50 py-18"><div className="mx-auto max-w-7xl px-5 lg:px-8"><p className="eyebrow">OUR PURPOSE</p><h2 className="section-title">About Toolnest</h2><p className="mt-5 max-w-4xl text-lg leading-8 text-slate-600">Toolnest is a local tool rental marketplace created to make professional tools more accessible and affordable. Instead of buying expensive equipment for one-time or short-term use, customers can browse tool categories, find nearby rental shops, check availability, and reserve tools online. Toolnest helps homeowners, workers, contractors, technicians and small businesses get the right equipment when they need it while reducing the cost of purchasing rarely used tools.</p><div className="mt-10 grid gap-5 md:grid-cols-3"><Feature icon={<CalendarDays/>} title="Affordable Daily Rentals" text="Pay only for the days you need."/><Feature icon={<MapPin/>} title="Nearby Tool Shops" text="Compare trusted local partners."/><Feature icon={<CheckCircle2/>} title="Easy Booking & Pickup" text="Reserve online and collect locally."/></div></div></section>
       <section id="how" className="scroll-mt-20 py-18"><div className="mx-auto max-w-7xl px-5 lg:px-8"><p className="eyebrow">SIMPLE LOCAL RENTAL</p><h2 className="section-title">How It Works</h2><div className="mt-10 grid gap-5 md:grid-cols-4">{[["01","Find a Tool","Browse professional equipment."],["02","Choose Nearby Shop","Compare distance, price and rating."],["03","Select Rental Dates","Choose available days and pickup time."],["04","Pick Up & Return","Collect locally and return after use."]].map(x=><div key={x[0]} className="rounded-2xl border border-slate-200 p-6"><span className="text-sm font-black text-blue-600">{x[0]}</span><h3 className="mt-5 text-lg font-extrabold">{x[1]}</h3><p className="mt-2 text-slate-600">{x[2]}</p></div>)}</div></div></section>
       <section id="contact" className="scroll-mt-20 bg-blue-700 py-18 text-white"><div className="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[.8fr_1.2fr] lg:px-8"><div><p className="text-sm font-bold tracking-widest text-blue-200">CONTACT</p><h2 className="mt-3 text-4xl font-black">How can we help?</h2><p className="mt-4 max-w-md text-blue-100">Questions about a tool, shop or booking? Send us a message and our support team will help.</p><div className="mt-8 space-y-3 text-blue-100"><p className="flex items-center gap-3"><Mail size={18}/> support@toolnest.in</p><p className="flex items-center gap-3"><Phone size={18}/> +91 90000 00000</p></div></div><form onSubmit={e=>e.preventDefault()} className="grid gap-4 rounded-2xl bg-white p-6 text-slate-900 sm:grid-cols-2"><input className="field" placeholder="Name"/><input className="field" placeholder="Email"/><input className="field" placeholder="Phone"/><input className="field" placeholder="City"/><textarea className="field min-h-28 sm:col-span-2" placeholder="Message"/><button className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white sm:col-span-2">Submit Message</button></form></div></section>
     </>}
     {view==="subcategories"&&<PageShell title={selectedCategory.name} crumb="Categories" onBack={goHome} intro="Choose the type of work to see available professional equipment."><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{selectedCategory.subs.map((s,i)=><button key={s} onClick={()=>{setSelectedSub(s);setView("tools");scrollTo(0,0)}} className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-blue-300 hover:shadow-lg"><span className="grid h-11 w-11 place-items-center rounded-xl bg-blue-50 font-black text-blue-700">0{i+1}</span><h3 className="mt-8 text-xl font-extrabold">{s}</h3><p className="mt-2 text-slate-600">Professional equipment available from nearby Toolnest partners.</p><span className="mt-6 flex items-center gap-2 font-bold text-blue-700">Browse tools <ArrowRight size={17}/></span></button>)}</div></PageShell>}
-    {view==="tools"&&<PageShell title={selectedSub} crumb={selectedCategory.name} onBack={()=>setView("subcategories")} intro="Compare professional tools, daily rental prices and nearby availability."><div className="grid gap-6 lg:grid-cols-3">{currentTools.map(t=><article key={t.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src={t.image} alt={t.name} className="h-52 w-full bg-white object-contain p-3"/><div className="p-5"><div className="flex items-center justify-between"><span className="text-sm font-bold text-blue-700">{t.brand}</span><span className="available">Available</span></div><h3 className="mt-3 text-xl font-extrabold leading-7">{t.name}</h3><p className="mt-2 text-sm text-slate-500">{t.spec}</p><div className="mt-5 flex items-end justify-between"><div><p className="text-2xl font-black">₹{t.price}<span className="text-sm font-semibold text-slate-500">/day</span></p><p className="text-xs text-slate-500">₹{t.deposit.toLocaleString("en-IN")} refundable deposit</p></div><p className="text-sm font-semibold text-slate-600">{t.shops} shops</p></div><div className="mt-5 grid grid-cols-2 gap-3"><button onClick={()=>{setSelectedTool(t);setView("detail");scrollTo(0,0)}} className="rounded-xl border border-slate-300 px-3 py-3 font-bold">View Tool</button><button onClick={()=>{setSelectedTool(t);setView("detail");scrollTo(0,0)}} className="rounded-xl bg-blue-600 px-3 py-3 font-bold text-white">Book Now</button></div></div></article>)}</div></PageShell>}
-    {view==="detail"&&<PageShell title={selectedTool.name} crumb={selectedSub} onBack={()=>setView("tools")} intro="Select a nearby shop, then choose your rental dates."><div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr]"><div><img src={selectedTool.image} alt={selectedTool.name} className="h-[390px] w-full rounded-2xl border border-slate-200 bg-white object-contain p-4"/><div className="mt-5 grid grid-cols-3 gap-3"><Spec label="Brand" value={selectedTool.brand}/><Spec label="Model" value={selectedTool.model}/><Spec label="Category" value={selectedSub}/></div><div className="mt-6 rounded-2xl bg-blue-50 p-5"><p className="font-extrabold text-blue-900">Pickup from Shop</p><p className="mt-1 text-sm text-blue-800">Reserve online, then collect the verified tool from your selected local partner.</p></div></div><div><div className="mb-5 flex items-center justify-between"><div><h2 className="text-2xl font-black">Available Near You</h2><p className="text-slate-500">Bhayandar to Churchgate · 50 city and highway pickup points</p></div><div className="flex rounded-xl bg-slate-100 p-1 text-sm font-bold"><button onClick={()=>setShopView("list")} className={`rounded-lg px-4 py-2 ${shopView==="list"?"bg-white text-slate-900 shadow-sm":"text-slate-500"}`}>List</button><button onClick={()=>setShopView("map")} className={`rounded-lg px-4 py-2 ${shopView==="map"?"bg-white text-blue-700 shadow-sm":"text-slate-500"}`}>Map</button></div></div>{shopView==="map"&&<div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white"><InteractiveShopMap selectedShop={selectedShop} onSelect={setSelectedShop}/><div className="grid gap-2 border-t p-4 sm:grid-cols-3">{shops.map(s=><button key={s.name} onClick={()=>setSelectedShop(s)} className={`rounded-xl border p-3 text-left ${selectedShop.name===s.name?"border-blue-500 bg-blue-50":"border-slate-200"}`}><span className="block font-extrabold">{s.name}</span><span className="mt-1 block text-xs text-slate-500">{s.area} · {s.distance}</span></button>)}</div></div>}<div className="space-y-4">{shops.map(s=><button key={s.name} onClick={()=>{setSelectedShop(s);setStartDay(null);setEndDay(null);setCalendarMonth(0);setCalendarError("");setClock(Date.now());setView("booking");scrollTo(0,0)}} className="w-full rounded-2xl border border-slate-200 p-5 text-left hover:border-blue-400 hover:shadow-md"><div className="flex justify-between gap-4"><div><h3 className="text-lg font-extrabold">{s.name}</h3><p className="mt-1 flex items-center gap-1 text-sm text-slate-600"><MapPin size={15}/>{s.area} · {s.distance}</p><p className="mt-1 text-xs text-slate-500">{s.hours}</p></div><span className="flex h-fit items-center gap-1 rounded-lg bg-amber-50 px-2 py-1 text-sm font-bold"><Star size={14} className="fill-amber-400 text-amber-400"/>{s.rating}</span></div><div className="mt-5 flex items-end justify-between border-t pt-4"><div><span className="text-xl font-black">₹{s.price}/day</span><p className="text-xs text-slate-500">₹{s.deposit.toLocaleString("en-IN")} refundable deposit</p></div><span className="rounded-xl bg-blue-600 px-4 py-2.5 font-bold text-white">Select Shop</span></div></button>)}</div></div></div></PageShell>}
-    {view==="booking"&&<PageShell title="Choose your rental dates" crumb={selectedShop.name} onBack={()=>setView("detail")} intro="Choose dates in the current month or next two months. Past dates and elapsed pickup times are unavailable (Mumbai time)."><div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr]"><section className="rounded-2xl border border-slate-200 p-5 sm:p-7"><div className="flex items-center justify-between"><div><h2 className="text-xl font-black">{rentalMonths[calendarMonth].name}</h2><p className="mt-1 text-sm text-slate-500">{endDay?"Rental range selected":"Click a start date, then click a return date"}</p></div><div className="flex gap-2"><button aria-label="Previous month" disabled={calendarMonth===0} onClick={()=>setCalendarMonth(m=>Math.max(0,m-1))} className="cal-nav disabled:opacity-30"><ChevronLeft size={18}/></button><button aria-label="Next month" disabled={calendarMonth===2} onClick={()=>setCalendarMonth(m=>Math.min(2,m+1))} className="cal-nav rotate-180 disabled:opacity-30"><ChevronLeft size={18}/></button></div></div><div className="mt-5 grid grid-cols-7 text-center text-xs font-bold text-slate-400">{["MON","TUE","WED","THU","FRI","SAT","SUN"].map(d=><span key={d}>{d}</span>)}</div><div className="mt-3 grid grid-cols-7 gap-1">{Array.from({length:rentalMonths[calendarMonth].weekday},(_,i)=><span key={`blank-${i}`}/>)}{Array.from({length:rentalMonths[calendarMonth].days},(_,i)=>i+1).map(d=>{const absoluteDay=rentalMonths[calendarMonth].offset+d;const booked=absoluteDay>=calendar.today&&isBooked(absoluteDay);const unavailable=booked||absoluteDay<calendar.today||(absoluteDay===calendar.today&&pickupSlots.every(p=>pickupTimestamp({start:absoluteDay,pickup:p})<=clock));const selected=!!startDay&&absoluteDay>=startDay&&absoluteDay<=(endDay??startDay);return <button key={d} title={booked?"Already booked":unavailable?"Unavailable":formatRentalDate(absoluteDay)} aria-label={`${formatRentalDate(absoluteDay)}${booked?", booked":unavailable?", unavailable":", available"}`} style={booked?{backgroundColor:"#fef3c7",color:"#92400e",textDecoration:"none"}:undefined} disabled={unavailable} onClick={()=>{setCalendarError("");if(!startDay||endDay){setStartDay(absoluteDay);setEndDay(null)}else if(absoluteDay>=startDay){if(!rentalRangeFree(startDay,absoluteDay,isBooked)){setCalendarError("This range includes booked dates. Choose dates before or after the booked days.");return;}setEndDay(absoluteDay)}else{setStartDay(absoluteDay);setEndDay(null)}}} className={`calendar-day ${unavailable?"unavailable":""} ${selected?"selected":""}`}>{d}{booked&&<span className="block text-[9px] leading-3 font-semibold">Booked</span>}</button>})}</div><div className="mt-5 flex flex-wrap gap-4 text-xs font-semibold"><Legend color="bg-emerald-100" label="Available"/><Legend color="bg-amber-100" label="Booked"/><Legend color="bg-slate-200" label="Unavailable"/><Legend color="bg-blue-600" label="Selected"/></div>{startDay&&endDay&&<div className="mt-8 border-t pt-7"><h3 className="flex items-center gap-2 text-lg font-black"><Clock size={20}/> Select Pickup Time</h3><p className="mt-1 text-sm text-slate-500">Choose a pickup slot after confirming your rental days.</p><div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">{pickupSlots.map(p=>{const elapsed=pickupTimestamp({start:startDay,pickup:p})<=clock;return <button disabled={elapsed} onClick={()=>{setPickup(p);setCalendarError("")}} key={p} className={`rounded-xl border px-3 py-3 text-sm font-bold ${elapsed?"cursor-not-allowed bg-slate-100 text-slate-400":pickup===p?"border-blue-600 bg-blue-600 text-white":"border-slate-200 hover:border-blue-400"}`}>{p}</button>})}</div></div>}</section><aside className="h-fit rounded-2xl bg-slate-950 p-6 text-white lg:sticky lg:top-24"><p className="text-sm font-bold text-blue-300">BOOKING SUMMARY</p><div className="mt-5 flex gap-4"><img src={selectedTool.image} alt="" className="h-20 w-20 rounded-xl bg-white object-contain p-1"/><div><h3 className="font-extrabold">{selectedTool.name}</h3><p className="mt-1 text-sm text-slate-400">{selectedShop.name} · {selectedShop.distance}</p></div></div><div className="mt-6 space-y-3 border-y border-white/15 py-5 text-sm"><Row k="Start date" v={formatRentalDate(startDay)}/><Row k="Return date" v={formatRentalDate(endDay)}/><Row k="Booking duration" v={days?`${days} days`:"—"}/><Row k="Price per day" v={`₹${selectedShop.price}`}/><Row k="Rental cost" v={`₹${(days*selectedShop.price).toLocaleString("en-IN")}`}/><Row k="Refundable deposit" v={`₹${selectedShop.deposit.toLocaleString("en-IN")}`}/><Row k="Pickup time" v={days?pickup:"After dates"}/></div><div className="flex items-center justify-between py-5"><span className="font-bold">Total</span><span className="text-2xl font-black">₹{(days*selectedShop.price+selectedShop.deposit).toLocaleString("en-IN")}</span></div>{calendarError&&<p role="alert" className="mb-3 text-sm text-amber-300">{calendarError}</p>}{days>0&&!bookingReady&&<p className="mb-3 text-sm text-amber-300">Select a future pickup slot and valid dates to continue.</p>}<button disabled={!bookingReady} onClick={confirmBooking} className="w-full rounded-xl bg-blue-500 py-3.5 font-extrabold disabled:opacity-40">Confirm Booking</button><p className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400"><ShieldCheck size={15}/> Deposit is refundable after return</p></aside></div></PageShell>}
+    {view==="tools"&&<PageShell title={selectedSub} crumb={selectedCategory.name} onBack={()=>setView("subcategories")} intro="Compare tool-specific indicative daily rental prices and nearby locations."><PricingNote/><div className="grid gap-6 lg:grid-cols-3">{currentTools.map(t=><article key={t.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src={t.image} alt={t.name} className="h-52 w-full bg-white object-contain p-3"/><div className="p-5"><div className="flex items-center justify-between"><span className="text-sm font-bold text-blue-700">{t.brand}</span><span className="available">Available</span></div><h3 className="mt-3 text-xl font-extrabold leading-7">{t.name}</h3><p className="mt-2 text-sm text-slate-500">{t.spec}</p><div className="mt-5 flex items-end justify-between"><div><p className="text-2xl font-black">₹{t.price.toLocaleString("en-IN")}<span className="text-sm font-semibold text-slate-500">/day</span></p><p className="text-xs text-slate-500">₹{t.deposit.toLocaleString("en-IN")} refundable deposit</p></div><p className="text-sm font-semibold text-slate-600">{t.shops} shops</p></div><div className="mt-5 grid grid-cols-2 gap-3"><button onClick={()=>{setSelectedTool(t);setSelectedShop(quoteShop(shops[0],t));setView("detail");scrollTo(0,0)}} className="rounded-xl border border-slate-300 px-3 py-3 font-bold">View Tool</button><button onClick={()=>{setSelectedTool(t);setSelectedShop(quoteShop(shops[0],t));setView("detail");scrollTo(0,0)}} className="rounded-xl bg-blue-600 px-3 py-3 font-bold text-white">Book Now</button></div></div></article>)}</div></PageShell>}
+    {view==="detail"&&<PageShell title={selectedTool.name} crumb={selectedSub} onBack={()=>setView("tools")} intro="Select a nearby shop, then choose your rental dates."><PricingNote/><div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr]"><div><img src={selectedTool.image} alt={selectedTool.name} className="h-[390px] w-full rounded-2xl border border-slate-200 bg-white object-contain p-4"/><div className="mt-5 grid grid-cols-3 gap-3"><Spec label="Brand" value={selectedTool.brand}/><Spec label="Model" value={selectedTool.model}/><Spec label="Category" value={selectedSub}/></div><div className="mt-6 rounded-2xl bg-blue-50 p-5"><p className="font-extrabold text-blue-900">Pickup from Shop</p><p className="mt-1 text-sm text-blue-800">Reserve online, then collect the verified tool from your selected local partner.</p></div></div><div><div className="mb-5 flex items-center justify-between"><div><h2 className="text-2xl font-black">Available Near You</h2><p className="text-slate-500">Bhayandar to Churchgate · 50 city and highway pickup points</p></div><div className="flex rounded-xl bg-slate-100 p-1 text-sm font-bold"><button onClick={()=>setShopView("list")} className={`rounded-lg px-4 py-2 ${shopView==="list"?"bg-white text-slate-900 shadow-sm":"text-slate-500"}`}>List</button><button onClick={()=>setShopView("map")} className={`rounded-lg px-4 py-2 ${shopView==="map"?"bg-white text-blue-700 shadow-sm":"text-slate-500"}`}>Map</button></div></div>{shopView==="map"&&<div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white"><InteractiveShopMap shopOptions={pricedShops} selectedShop={selectedShop} onSelect={setSelectedShop}/><div className="grid gap-2 border-t p-4 sm:grid-cols-3">{pricedShops.map(s=><button key={s.name} onClick={()=>setSelectedShop(s)} className={`rounded-xl border p-3 text-left ${selectedShop.name===s.name?"border-blue-500 bg-blue-50":"border-slate-200"}`}><span className="block font-extrabold">{s.name}</span><span className="mt-1 block text-xs text-slate-500">{s.area} · {s.distance}</span></button>)}</div></div>}<div className="space-y-4">{pricedShops.map(s=><button key={s.name} onClick={()=>{setSelectedShop(s);setStartDay(null);setEndDay(null);setCalendarMonth(0);setCalendarError("");setClock(Date.now());setView("booking");scrollTo(0,0)}} className="w-full rounded-2xl border border-slate-200 p-5 text-left hover:border-blue-400 hover:shadow-md"><div className="flex justify-between gap-4"><div><h3 className="text-lg font-extrabold">{s.name}</h3><p className="mt-1 flex items-center gap-1 text-sm text-slate-600"><MapPin size={15}/>{s.area} · {s.distance}</p><p className="mt-1 text-xs text-slate-500">{s.hours}</p></div><span className="flex h-fit items-center gap-1 rounded-lg bg-amber-50 px-2 py-1 text-sm font-bold"><Star size={14} className="fill-amber-400 text-amber-400"/>{s.rating}</span></div><div className="mt-5 flex items-end justify-between border-t pt-4"><div><span className="text-xl font-black">₹{s.price.toLocaleString("en-IN")}/day</span><p className="text-xs text-slate-500">₹{s.deposit.toLocaleString("en-IN")} refundable deposit</p></div><span className="rounded-xl bg-blue-600 px-4 py-2.5 font-bold text-white">Select Shop</span></div></button>)}</div></div></div></PageShell>}
+    {view==="booking"&&<PageShell title="Choose your rental dates" crumb={selectedShop.name} onBack={()=>setView("detail")} intro="Choose dates in the current month or next two months. Past dates and elapsed pickup times are unavailable (Mumbai time)."><div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr]"><section className="rounded-2xl border border-slate-200 p-5 sm:p-7"><div className="flex items-center justify-between"><div><h2 className="text-xl font-black">{rentalMonths[calendarMonth].name}</h2><p className="mt-1 text-sm text-slate-500">{endDay?"Rental range selected":"Click a start date, then click a return date"}</p></div><div className="flex gap-2"><button aria-label="Previous month" disabled={calendarMonth===0} onClick={()=>setCalendarMonth(m=>Math.max(0,m-1))} className="cal-nav disabled:opacity-30"><ChevronLeft size={18}/></button><button aria-label="Next month" disabled={calendarMonth===2} onClick={()=>setCalendarMonth(m=>Math.min(2,m+1))} className="cal-nav rotate-180 disabled:opacity-30"><ChevronLeft size={18}/></button></div></div><div className="mt-5 grid grid-cols-7 text-center text-xs font-bold text-slate-400">{["MON","TUE","WED","THU","FRI","SAT","SUN"].map(d=><span key={d}>{d}</span>)}</div><div className="mt-3 grid grid-cols-7 gap-1">{Array.from({length:rentalMonths[calendarMonth].weekday},(_,i)=><span key={`blank-${i}`}/>)}{Array.from({length:rentalMonths[calendarMonth].days},(_,i)=>i+1).map(d=>{const absoluteDay=rentalMonths[calendarMonth].offset+d;const booked=absoluteDay>=calendar.today&&isBooked(absoluteDay);const unavailable=booked||absoluteDay<calendar.today||(absoluteDay===calendar.today&&pickupSlots.every(p=>pickupTimestamp({start:absoluteDay,pickup:p})<=clock));const selected=!!startDay&&absoluteDay>=startDay&&absoluteDay<=(endDay??startDay);return <button key={d} title={booked?"Already booked":unavailable?"Unavailable":formatRentalDate(absoluteDay)} aria-label={`${formatRentalDate(absoluteDay)}${booked?", booked":unavailable?", unavailable":", available"}`} style={booked?{backgroundColor:"#fef3c7",color:"#92400e",textDecoration:"none"}:undefined} disabled={unavailable} onClick={()=>{setCalendarError("");if(!startDay||endDay){setStartDay(absoluteDay);setEndDay(null)}else if(absoluteDay>=startDay){if(!rentalRangeFree(startDay,absoluteDay,isBooked)){setCalendarError("This range includes booked dates. Choose dates before or after the booked days.");return;}setEndDay(absoluteDay)}else{setStartDay(absoluteDay);setEndDay(null)}}} className={`calendar-day ${unavailable?"unavailable":""} ${selected?"selected":""}`}>{d}{booked&&<span className="block text-[9px] leading-3 font-semibold">Booked</span>}</button>})}</div><div className="mt-5 flex flex-wrap gap-4 text-xs font-semibold"><Legend color="bg-emerald-100" label="Available"/><Legend color="bg-amber-100" label="Booked"/><Legend color="bg-slate-200" label="Unavailable"/><Legend color="bg-blue-600" label="Selected"/></div>{startDay&&endDay&&<div className="mt-8 border-t pt-7"><h3 className="flex items-center gap-2 text-lg font-black"><Clock size={20}/> Select Pickup Time</h3><p className="mt-1 text-sm text-slate-500">Choose a pickup slot after confirming your rental days.</p><div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">{pickupSlots.map(p=>{const elapsed=pickupTimestamp({start:startDay,pickup:p})<=clock;return <button disabled={elapsed} onClick={()=>{setPickup(p);setCalendarError("")}} key={p} className={`rounded-xl border px-3 py-3 text-sm font-bold ${elapsed?"cursor-not-allowed bg-slate-100 text-slate-400":pickup===p?"border-blue-600 bg-blue-600 text-white":"border-slate-200 hover:border-blue-400"}`}>{p}</button>})}</div></div>}</section><aside className="h-fit rounded-2xl bg-slate-950 p-6 text-white lg:sticky lg:top-24"><p className="text-sm font-bold text-blue-300">BOOKING SUMMARY — ESTIMATE</p><div className="mt-5 flex gap-4"><img src={selectedTool.image} alt="" className="h-20 w-20 rounded-xl bg-white object-contain p-1"/><div><h3 className="font-extrabold">{selectedTool.name}</h3><p className="mt-1 text-sm text-slate-400">{selectedShop.name} · {selectedShop.distance}</p></div></div><div className="mt-6 space-y-3 border-y border-white/15 py-5 text-sm"><Row k="Start date" v={formatRentalDate(startDay)}/><Row k="Return date" v={formatRentalDate(endDay)}/><Row k="Booking duration" v={days?`${days} days`:"—"}/><Row k="Price per day" v={`₹${selectedShop.price}`}/><Row k="Rental cost" v={`₹${(days*selectedShop.price).toLocaleString("en-IN")}`}/><Row k="Refundable deposit" v={`₹${selectedShop.deposit.toLocaleString("en-IN")}`}/><Row k="Pickup time" v={days?pickup:"After dates"}/></div><div className="flex items-center justify-between py-5"><span className="font-bold">Estimated total</span><span className="text-2xl font-black">₹{(days*selectedShop.price+selectedShop.deposit).toLocaleString("en-IN")}</span></div>{calendarError&&<p role="alert" className="mb-3 text-sm text-amber-300">{calendarError}</p>}{days>0&&!bookingReady&&<p className="mb-3 text-sm text-amber-300">Select a future pickup slot and valid dates to continue.</p>}<button disabled={!bookingReady} onClick={confirmBooking} className="w-full rounded-xl bg-blue-500 py-3.5 font-extrabold disabled:opacity-40">Confirm Booking</button><p className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400"><ShieldCheck size={15}/> Deposit is refundable after return</p><p className="mt-3 text-xs text-slate-400">Estimate excludes GST, transport, fuel, operator and consumables where applicable. Confirm the final quote with the shop.</p></aside></div></PageShell>}
     {view==="confirmed"&&<div className="mx-auto max-w-2xl px-5 py-20 text-center"><span className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-100 text-emerald-700"><CheckCircle2 size={42}/></span><p className="mt-7 text-sm font-black tracking-widest text-blue-600">BOOKING {viewedBooking?.id??"DETAILS"}</p><h1 className="mt-3 text-4xl font-black">{viewedBooking?.status==="cancelled"?"Booking Cancelled":viewedBooking?.status==="previous"?"Rental Completed":viewedBooking?.status==="active"?"Rental Active":"Your Tool is Reserved!"}</h1><p className="mx-auto mt-4 max-w-lg text-slate-600">{viewedBooking?.status==="cancelled"?"This booking has been cancelled. No pickup is scheduled.":viewedBooking?.status==="previous"?"This rental has been completed.":viewedBooking?.status==="active"?`Your rental from ${selectedShop.name} is currently active.`:`Your tool is held at ${selectedShop.name}. Bring a valid photo ID when you collect it.`}</p><div className="mt-8 rounded-2xl border border-slate-200 p-6 text-left shadow-sm"><Row k="Tool" v={selectedTool.name}/><Row k="Shop" v={selectedShop.name}/><Row k="Address" v={selectedShop.address}/><Row k="Pickup" v={`${formatRentalDate(startDay)}, ${pickup}`}/><Row k="Rental amount" v={`₹${(days*selectedShop.price).toLocaleString("en-IN")}`}/></div><div className="mt-6 grid gap-3 sm:grid-cols-2"><button onClick={getDirections} className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 py-3.5 font-bold"><Navigation size={18}/> Get Directions</button><button onClick={()=>setView("dashboard")} className="rounded-xl bg-blue-600 py-3.5 font-bold text-white">View My Booking</button></div></div>}
     {view==="auth"&&<PageShell title="Welcome to Toolnest" crumb="Home" onBack={goHome} intro="Log in or create a demo account to view your rentals."><div className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl sm:p-8"><div className="grid grid-cols-2 rounded-xl bg-slate-100 p-1"><button onClick={()=>setAuthMode("login")} className={`rounded-lg py-2.5 font-bold ${authMode==="login"?"bg-white text-blue-700 shadow-sm":"text-slate-500"}`}>Log In</button><button onClick={()=>setAuthMode("signup")} className={`rounded-lg py-2.5 font-bold ${authMode==="signup"?"bg-white text-blue-700 shadow-sm":"text-slate-500"}`}>Sign Up</button></div><form onSubmit={e=>{e.preventDefault();completeDemoLogin()}} className="mt-6 space-y-4">{authMode==="signup"&&<label className="block text-sm font-bold">Full name<input required className="field mt-2 w-full font-normal" placeholder="Mohan Solanki"/></label>}<label className="block text-sm font-bold">Email or mobile number<input required className="field mt-2 w-full font-normal" placeholder="name@example.com"/></label><label className="block text-sm font-bold">Password<input required type="password" className="field mt-2 w-full font-normal" placeholder="Enter password"/></label>{authMode==="signup"&&<label className="block text-sm font-bold">Confirm password<input required type="password" className="field mt-2 w-full font-normal" placeholder="Re-enter password"/></label>}<button className="w-full rounded-xl bg-blue-600 py-3.5 font-extrabold text-white">{authMode==="login"?"Log In to Dashboard":"Create Demo Account"}</button></form><button onClick={completeDemoLogin} className="mt-3 w-full rounded-xl border border-blue-200 py-3 font-bold text-blue-700">Continue with Demo Account</button><p className="mt-4 text-center text-xs text-slate-500">Demo mode only — no real account or password is saved.</p></div></PageShell>}
     {view==="dashboard"&&<PageShell title="My Toolnest" crumb="Customer dashboard" onBack={goHome} intro="Track all your upcoming, active and previous rentals.">{bookingNotice&&<p role="status" className="mb-4 rounded-xl bg-blue-50 p-4 text-blue-800">{bookingNotice}</p>}<div className="mb-7 flex gap-2 overflow-auto">{dashboardTabs.map(([label,status])=><button key={status} onClick={()=>setDashboardTab(status)} className={`whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-bold ${dashboardTab===status?"bg-blue-600 text-white":"bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{label}<span className="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">{bookings.filter(b=>b.status===status).length}</span></button>)}</div><div className="space-y-4">{bookings.filter(b=>b.status===dashboardTab).map(booking=><div key={booking.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex flex-col gap-5 sm:flex-row sm:items-center"><img src={booking.tool.image} className="h-28 w-36 rounded-xl bg-white object-contain p-2" alt={booking.tool.name}/><div className="flex-1"><span className="available">{booking.status==="upcoming"?"Reserved":booking.status.charAt(0).toUpperCase()+booking.status.slice(1)}</span><h3 className="mt-2 text-xl font-extrabold">{booking.tool.name}</h3><p className="mt-1 text-slate-500">{booking.shop.name} · {formatRentalDate(booking.start)} to {formatRentalDate(booking.end)}</p><p className="mt-1 text-sm text-slate-500">Pickup {booking.pickup} · {booking.days} days · Booking {booking.id}</p></div><div className="flex flex-wrap items-center gap-3">{booking.status==="upcoming"&&<button disabled={!canCancelBooking(booking,clock||Date.now())} title="Cancellation is available only before the pickup slot starts (Mumbai time)." onClick={()=>cancelBooking(booking.id)} className="rounded-xl border border-red-200 px-5 py-3 font-bold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40">{canCancelBooking(booking,clock||Date.now())?"Cancel Booking":"Pickup time passed"}</button>}<button onClick={()=>{setViewedBooking(booking);setSelectedTool(booking.tool);setSelectedShop(booking.shop);setStartDay(booking.start);setEndDay(booking.end);setPickup(booking.pickup);setView("confirmed");scrollTo(0,0)}} className="rounded-xl border border-slate-300 px-5 py-3 font-bold hover:border-blue-500 hover:text-blue-700">View Booking</button></div></div></div>)}{bookings.filter(b=>b.status===dashboardTab).length===0&&<div className="rounded-2xl border border-dashed border-slate-300 bg-white py-14 text-center"><CalendarDays className="mx-auto text-slate-400"/><h3 className="mt-3 font-extrabold">No {dashboardTabs.find(x=>x[1]===dashboardTab)?.[0].toLowerCase()}</h3><p className="mt-1 text-sm text-slate-500">Bookings in this section will appear here.</p></div>}</div></PageShell>}
     <footer className="border-t border-slate-200 bg-white py-8"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 text-sm text-slate-500 sm:flex-row lg:px-8"><span>© 2026 Toolnest. Professional tools, rented locally.</span><span>Book online · Pick up nearby · Return on time</span></div></footer>
   </main>
 }
-function InteractiveShopMap({selectedShop,onSelect}:{selectedShop:(typeof shops)[number];onSelect:(shop:(typeof shops)[number])=>void}){
+function InteractiveShopMap({shopOptions,selectedShop,onSelect}:{shopOptions:(typeof shops)[number][];selectedShop:(typeof shops)[number];onSelect:(shop:(typeof shops)[number])=>void}){
   const mapEl=useRef<HTMLDivElement|null>(null);
   const mapRef=useRef<any>(null);
   useEffect(()=>{
@@ -291,12 +974,12 @@ function InteractiveShopMap({selectedShop,onSelect}:{selectedShop:(typeof shops)
       mapRef.current=map;
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
       const bounds:Array<[number,number]>=[];
-      shops.forEach((shop,index)=>{
+      shopOptions.forEach((shop,index)=>{
         const point:[number,number]=[shop.lat,shop.lng];
         bounds.push(point);
         const icon=L.divIcon({className:"",html:`<span style="display:grid;place-items:center;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#ef4444;border:3px solid white;box-shadow:0 3px 10px rgba(15,23,42,.35);color:white"><b style="transform:rotate(45deg);font:700 11px system-ui">${index+1}</b></span>`,iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[0,-30]});
         const marker=L.marker(point,{icon,title:shop.name}).addTo(map);
-        marker.bindPopup(`<div style="min-width:230px;font-family:system-ui;color:#0f172a"><strong style="font-size:16px">${shop.name}</strong><div style="margin-top:6px;color:#475569">${shop.address}</div><div style="margin-top:8px"><b>${shop.distance}</b> · ⭐ ${shop.rating}</div><div style="margin-top:4px">${shop.hours}</div><div style="margin-top:9px;font-size:17px;font-weight:800;color:#1d4ed8">₹${shop.price}/day</div><div style="font-size:12px;color:#64748b">₹${shop.deposit.toLocaleString("en-IN")} refundable deposit</div></div>`);
+        marker.bindPopup(`<div style="min-width:230px;font-family:system-ui;color:#0f172a"><strong style="font-size:16px">${shop.name}</strong><div style="margin-top:6px;color:#475569">${shop.address}</div><div style="margin-top:8px"><b>${shop.distance}</b> · ⭐ ${shop.rating}</div><div style="margin-top:4px">${shop.hours}</div><div style="margin-top:9px;font-size:17px;font-weight:800;color:#1d4ed8">₹${shop.price.toLocaleString("en-IN")}/day</div><div style="font-size:12px;color:#64748b">₹${shop.deposit.toLocaleString("en-IN")} refundable deposit</div></div>`);
         marker.on("click",()=>onSelect(shop));
       });
       map.fitBounds(bounds,{padding:[28,28]});
@@ -311,7 +994,7 @@ function InteractiveShopMap({selectedShop,onSelect}:{selectedShop:(typeof shops)
       else {const script=document.createElement("script");script.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";script.dataset.toolnestLeaflet="true";script.onload=initialise;document.head.appendChild(script);}
     }
     return()=>{cancelled=true;if(mapRef.current){mapRef.current.remove();mapRef.current=null;}};
-  },[onSelect]);
+  },[onSelect,shopOptions]);
   return <div className="relative"><div ref={mapEl} className="h-[460px] w-full bg-slate-100" aria-label="Interactive map showing Toolnest shop locations from Bhayandar to Churchgate"/><div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs font-bold shadow">50 clickable shop pins</div><div className="border-t bg-blue-50 px-4 py-3 text-sm text-blue-900"><b>Selected:</b> {selectedShop.name} · {selectedShop.area}</div></div>
 }
 function PageShell({title,crumb,onBack,intro,children}:{title:string;crumb:string;onBack:()=>void;intro:string;children:React.ReactNode}){return <section className="min-h-[75vh] bg-slate-50 py-12"><div className="mx-auto max-w-7xl px-5 lg:px-8"><button onClick={onBack} className="mb-8 flex items-center gap-2 text-sm font-bold text-blue-700"><ChevronLeft size={18}/> Back to {crumb}</button><div className="mb-10"><p className="eyebrow">TOOLNEST RENTALS</p><h1 className="mt-2 text-4xl font-black tracking-tight sm:text-5xl">{title}</h1><p className="mt-3 max-w-2xl text-lg text-slate-600">{intro}</p></div>{children}</div></section>}
