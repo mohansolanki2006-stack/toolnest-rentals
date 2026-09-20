@@ -31,669 +31,667 @@ const equipmentNames: Record<string,string[]> = {
 };
 const categoryBrands: Record<string,string[]> = {"power-tools":["Bosch","Makita","Hilti"],construction:["Wacker","Honda","JCB"],gardening:["Honda","Stihl","Husqvarna"],cleaning:["Kärcher","Nilfisk","Taski"],welding:["ESAB","Ador","Rilon"],electrical:["Fluke","Megger","Bosch"],plumbing:["Ridgid","Rothenberger","Kirloskar"],painting:["Graco","Wagner","Bosch"],woodworking:["DeWalt","Makita","Bosch"],other:["Genie","Kärcher","Ridgid"]};
 function exactToolImage(name:string,index:number){ const host=["tse1","tse2","tse3"][index]; const query=encodeURIComponent(`${name} professional machine product`); return `https://${host}.mm.bing.net/th?q=${query}&w=900&h=600&c=7&rs=1&p=0`; }
-// Indicative equipment-only daily tariffs, not verified Mumbai shop quotes.
-// Reviewed 2026-09-20. Each tuple is [daily INR, refundable deposit INR].
-// Ajax benchmark: https://www.kkearthmovers.com/concrete-mixer-rental-service.html
-// Argo 2500 comparator: https://samarthinfratech.com/ajax-fiori-on-rent/
-// Other rates and all deposits are planning estimates requiring supplier confirmation.
-// No monthly-to-daily conversion or claimed live shop-specific pricing.
+// Budget presentation tariffs requested by the owner, not verified supplier quotes.
+// Each tuple is [daily INR, refundable deposit INR].
+// Reduced from the prior estimates; actual heavy-equipment hire may cost more.
+// All prices and deposits require supplier confirmation.
 const rentalTariffs:Record<string,[number,number][]>={
   "Drilling & Breaking": [
     [
-      800,
-      5000
+      650,
+      1000
     ],
     [
-      500,
-      3000
+      400,
+      500
     ],
     [
-      2200,
-      15000
+      1550,
+      2000
     ]
   ],
   "Cutting & Sawing": [
     [
+      400,
+      500
+    ],
+    [
+      700,
+      1000
+    ],
+    [
       500,
-      3000
-    ],
-    [
-      900,
-      6000
-    ],
-    [
-      650,
-      4000
+      500
     ]
   ],
   "Grinding & Sanding": [
     [
-      350,
-      2000
+      300,
+      500
     ],
     [
-      600,
-      4000
+      500,
+      500
     ],
     [
-      1800,
-      12000
+      1250,
+      1500
     ]
   ],
   "Woodworking": [
     [
+      450,
+      500
+    ],
+    [
+      500,
+      500
+    ],
+    [
       550,
-      3000
-    ],
-    [
-      600,
-      4000
-    ],
-    [
-      700,
-      5000
+      1000
     ]
   ],
   "Heavy-Duty Power Tools": [
     [
-      2500,
-      20000
+      1750,
+      2000
     ],
     [
-      1800,
-      12000
+      1250,
+      1500
     ],
     [
-      600,
-      4000
+      500,
+      500
     ]
   ],
   "Concrete Equipment": [
     [
-      6500,
-      30000
+      3250,
+      3500
     ],
     [
-      700,
-      4000
+      550,
+      1000
     ],
     [
-      3500,
-      20000
+      1750,
+      2000
     ]
   ],
   "Compaction Equipment": [
     [
-      1800,
-      10000
+      1250,
+      1500
     ],
     [
-      2200,
-      12000
+      1550,
+      2000
     ],
     [
-      4500,
-      25000
+      2250,
+      2500
     ]
   ],
   "Cutting Equipment": [
     [
-      2500,
-      15000
+      1750,
+      2000
     ],
     [
-      1800,
-      10000
+      1250,
+      1500
     ],
     [
-      12000,
-      50000
+      3000,
+      3000
     ]
   ],
   "Lifting Equipment": [
     [
-      2500,
-      15000
+      1750,
+      2000
     ],
     [
-      1500,
-      10000
+      1050,
+      1500
     ],
     [
-      1200,
-      8000
+      850,
+      1000
     ]
   ],
   "Site Equipment": [
     [
-      1800,
-      10000
+      1250,
+      1500
     ],
     [
-      2800,
-      15000
+      1950,
+      2000
     ],
     [
-      1800,
-      10000
+      1250,
+      1500
     ]
   ],
   "Lawn Equipment": [
     [
-      1200,
-      6000
+      850,
+      1000
     ],
     [
-      700,
-      4000
+      550,
+      1000
     ],
     [
-      4500,
-      25000
+      2250,
+      2500
     ]
   ],
   "Tree Cutting": [
     [
-      1000,
-      6000
+      800,
+      1000
     ],
     [
-      1200,
-      8000
+      850,
+      1000
     ],
     [
-      650,
-      4000
+      500,
+      500
     ]
   ],
   "Hedge & Garden Cutting": [
     [
-      600,
-      4000
+      500,
+      500
     ],
     [
-      900,
-      5000
+      700,
+      1000
     ],
     [
-      550,
-      3000
+      450,
+      500
     ]
   ],
   "Spraying Equipment": [
     [
-      900,
-      5000
+      700,
+      1000
     ],
     [
-      250,
-      1500
+      200,
+      500
     ],
     [
-      1200,
-      7000
+      850,
+      1000
     ]
   ],
   "Soil & Digging Equipment": [
     [
-      1500,
-      8000
+      1050,
+      1500
     ],
     [
-      2200,
-      12000
+      1550,
+      2000
     ],
     [
-      6500,
-      30000
+      3250,
+      3500
     ]
   ],
   "Pressure Washers": [
     [
-      1300,
-      7000
-    ],
-    [
       900,
-      5000
+      1000
     ],
     [
-      2500,
-      15000
+      700,
+      1000
+    ],
+    [
+      1750,
+      2000
     ]
   ],
   "Industrial Vacuums": [
     [
+      550,
+      1000
+    ],
+    [
       700,
-      4000
+      1000
     ],
     [
-      900,
-      6000
-    ],
-    [
-      1800,
-      10000
+      1250,
+      1500
     ]
   ],
   "Floor Cleaning Machines": [
     [
-      2800,
-      15000
+      1950,
+      2000
     ],
     [
-      2500,
-      15000
+      1750,
+      2000
     ],
     [
-      6500,
-      30000
+      3250,
+      3500
     ]
   ],
   "Floor Polishers": [
     [
-      1200,
-      7000
+      850,
+      1000
     ],
     [
-      1400,
-      8000
+      1000,
+      1000
     ],
     [
-      1800,
-      10000
+      1250,
+      1500
     ]
   ],
   "Welding Machines": [
     [
-      700,
-      5000
+      550,
+      1000
     ],
     [
-      1800,
-      12000
+      1250,
+      1500
     ],
     [
-      1600,
-      10000
+      1100,
+      1500
     ]
   ],
   "Cutting Machines": [
     [
-      2200,
-      15000
+      1550,
+      2000
     ],
     [
-      650,
-      5000
+      500,
+      500
     ],
     [
-      10000,
-      50000
+      3500,
+      3500
     ]
   ],
   "Air Compressors": [
     [
-      1200,
-      8000
+      850,
+      1000
     ],
     [
-      4500,
-      25000
+      2250,
+      2500
     ],
     [
-      4000,
-      25000
+      2000,
+      2000
     ]
   ],
   "Fabrication Equipment": [
     [
-      1200,
-      8000
+      850,
+      1000
     ],
     [
-      1800,
-      12000
+      1250,
+      1500
     ],
     [
-      450,
-      3000
+      350,
+      500
     ]
   ],
   "Electrical Testers": [
     [
-      450,
-      5000
+      350,
+      500
     ],
     [
-      1200,
-      15000
+      850,
+      1000
     ],
     [
-      500,
-      5000
+      400,
+      500
     ]
   ],
   "Cable Testing": [
     [
-      4500,
-      40000
+      2250,
+      2500
     ],
     [
-      8500,
-      50000
+      3500,
+      3500
     ],
     [
-      1800,
-      20000
+      1250,
+      1500
     ]
   ],
   "Laser Measurement": [
     [
-      350,
-      3000
+      300,
+      500
     ],
     [
-      1500,
-      15000
+      1050,
+      1500
     ],
     [
-      1000,
-      10000
+      800,
+      1000
     ]
   ],
   "Professional Measuring Equipment": [
     [
-      2500,
-      30000
+      1750,
+      2000
     ],
     [
-      1200,
-      15000
+      850,
+      1000
     ],
     [
-      3000,
-      25000
+      2100,
+      2500
     ]
   ],
   "Pipe Cutting": [
     [
-      450,
-      3000
+      350,
+      500
     ],
     [
-      750,
-      5000
+      600,
+      1000
     ],
     [
-      4500,
-      30000
+      2250,
+      2500
     ]
   ],
   "Drain Cleaning": [
     [
-      1800,
-      12000
+      1250,
+      1500
     ],
     [
-      4500,
-      25000
+      2250,
+      2500
     ],
     [
-      1000,
-      6000
+      800,
+      1000
     ]
   ],
   "Water Pumps": [
     [
-      1200,
-      7000
+      850,
+      1000
     ],
     [
-      1300,
-      8000
+      900,
+      1000
     ],
     [
-      1800,
-      10000
+      1250,
+      1500
     ]
   ],
   "Pipe Threading": [
     [
-      2200,
-      15000
+      1550,
+      2000
     ],
     [
-      2000,
-      15000
+      1400,
+      1500
     ],
     [
-      2800,
-      20000
+      1950,
+      2000
     ]
   ],
   "Professional Plumbing Machines": [
     [
-      1200,
-      8000
+      850,
+      1000
     ],
     [
-      4500,
-      25000
+      2250,
+      2500
     ],
     [
-      2800,
-      20000
+      1950,
+      2000
     ]
   ],
   "Paint Sprayers": [
     [
-      600,
-      4000
+      500,
+      500
     ],
     [
-      900,
-      6000
+      700,
+      1000
     ],
     [
-      1400,
-      10000
+      1000,
+      1000
     ]
   ],
   "Airless Spray Machines": [
     [
-      2200,
-      15000
+      1550,
+      2000
     ],
     [
-      1500,
-      10000
+      1050,
+      1500
     ],
     [
-      2500,
-      18000
+      1750,
+      2000
     ]
   ],
   "Surface Sanders": [
     [
-      450,
-      3000
+      350,
+      500
     ],
     [
-      600,
-      4000
+      500,
+      500
     ],
     [
-      900,
-      8000
+      700,
+      1000
     ]
   ],
   "Wall Sanders": [
     [
+      650,
+      1000
+    ],
+    [
+      1100,
+      1500
+    ],
+    [
       800,
-      5000
-    ],
-    [
-      1600,
-      15000
-    ],
-    [
-      1000,
-      7000
+      1000
     ]
   ],
   "Surface Preparation Equipment": [
     [
-      8500,
-      40000
-    ],
-    [
       3500,
-      20000
+      3500
     ],
     [
-      2200,
-      15000
+      1750,
+      2000
+    ],
+    [
+      1550,
+      2000
     ]
   ],
   "Circular Saws": [
     [
-      500,
-      3000
+      400,
+      500
     ],
     [
-      1000,
-      8000
+      800,
+      1000
     ],
     [
-      1100,
-      8000
+      750,
+      1000
     ]
   ],
   "Mitre Saws": [
     [
-      1100,
-      8000
+      750,
+      1000
     ],
     [
-      1000,
-      7000
+      800,
+      1000
     ],
     [
-      1300,
-      10000
+      900,
+      1000
     ]
   ],
   "Table Saws": [
     [
-      1500,
-      10000
+      1050,
+      1500
     ],
     [
-      1600,
-      12000
+      1100,
+      1500
     ],
     [
-      1800,
-      12000
+      1250,
+      1500
     ]
   ],
   "Planers": [
     [
-      1800,
-      12000
+      1250,
+      1500
     ],
     [
-      1600,
-      10000
+      1100,
+      1500
     ],
     [
-      550,
-      3000
+      450,
+      500
     ]
   ],
   "Routers": [
     [
-      600,
-      4000
+      500,
+      500
     ],
     [
-      450,
-      3000
+      350,
+      500
     ],
     [
-      650,
-      5000
+      500,
+      500
     ]
   ],
   "Professional Woodworking Machines": [
     [
-      6500,
-      30000
+      3250,
+      3500
     ],
     [
-      4500,
-      25000
+      2250,
+      2500
     ],
     [
-      3500,
-      20000
+      1750,
+      2000
     ]
   ],
   "Heavy-Duty Ladders": [
     [
+      400,
+      500
+    ],
+    [
       500,
-      3000
+      500
     ],
     [
-      650,
-      4000
-    ],
-    [
-      750,
-      5000
+      600,
+      1000
     ]
   ],
   "Material Handling": [
     [
-      700,
-      5000
+      550,
+      1000
     ],
     [
-      2500,
-      15000
+      1750,
+      2000
     ],
     [
-      250,
-      1500
+      200,
+      500
     ]
   ],
   "Site Safety Equipment": [
     [
-      600,
-      4000
+      500,
+      500
     ],
     [
-      1000,
-      6000
+      800,
+      1000
     ],
     [
-      1200,
-      15000
+      850,
+      1000
     ]
   ],
   "Specialised Machines": [
     [
-      1200,
-      8000
+      850,
+      1000
     ],
     [
-      2200,
-      15000
+      1550,
+      2000
     ],
     [
-      2800,
-      20000
+      1950,
+      2000
     ]
   ]
 };
@@ -703,7 +701,7 @@ function toolsFor(sub:string,category:Category):Tool[]{
     return {name,brand:name.split(" ")[0]||categoryBrands[category.slug]?.[i]||"Professional",
       model:`TN-${category.slug.slice(0,3).toUpperCase()}-${101+i}`,
       spec:name==="Ajax Concrete Mixer"?"Self-loading mixer, approximately 2–2.5 m³; transport and operator arrangement required":
-      `Professional-grade ${sub.toLowerCase()} equipment`,
+      `Professional-grade ${sub.toLowerCase()}${sub.toLowerCase().endsWith("equipment")?"":" equipment"}`,
       price,deposit,shops:50,image:exactToolImage(name,i)};
   });
 }
@@ -772,7 +770,7 @@ function quoteShop(shop:(typeof shops)[number],tool:Tool){
   return {...shop,price:tool.price,deposit:tool.deposit};
 }
 function PricingNote(){
-  return <p className="mt-3 text-xs leading-5 text-slate-500">Indicative rental and refundable deposit estimates, subject to shop confirmation and exact machine capacity. Daily rate assumes up to 8 operating hours. GST, transport, fuel, operator and consumables are extra where applicable; these are not included in the displayed total. Heavy/stationary machines require delivery or on-site arrangements.</p>;
+  return <p className="mt-3 text-xs leading-5 text-slate-500">Budget rental and refundable deposit estimates, subject to shop confirmation and exact machine capacity. Actual supplier rates, especially for heavy equipment, may be higher. Daily rate assumes up to 8 operating hours. GST, transport, fuel, operator and consumables are extra where applicable; these are not included in the displayed total. Heavy/stationary machines require delivery or on-site arrangements.</p>;
 }
 type View = "home"|"subcategories"|"tools"|"detail"|"booking"|"confirmed"|"auth"|"dashboard";
 // Keep the original day-number epoch so saved bookings retain their dates.
@@ -945,7 +943,7 @@ export default function Home() {
       {menu&&<div className="grid gap-1 border-t p-4 font-semibold md:hidden">{[["Home","home"],["Categories","categories"],["About","about"],["How It Works","how"],["Contact","contact"]].map(([label,id])=><button key={id} onClick={()=>id==="home"?goHome():nav(id)} className="rounded-lg px-3 py-3 text-left hover:bg-blue-50">{label}</button>)}<button onClick={()=>{setMenu(false);setView(loggedIn?"dashboard":"auth")}} className="flex items-center gap-2 rounded-lg px-3 py-3 text-left text-blue-700 hover:bg-blue-50"><UserRound size={18}/>{loggedIn?"My Dashboard":"Login"}</button>{loggedIn&&<button onClick={()=>{setMenu(false);logout()}} className="flex items-center gap-2 rounded-lg px-3 py-3 text-left text-red-600 hover:bg-red-50"><LogOut size={18}/>Logout</button>}</div>}
     </header>
     {view==="home"&&<>
-      <section className="hero-grid overflow-hidden bg-slate-950 text-white"><div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24"><div><span className="mb-5 inline-flex rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">Professional tools. Local pickup. Fair daily prices.</span><h1 className="text-5xl font-black leading-[1.03] tracking-tight sm:text-6xl">Borrow Tools.<br/><span className="text-blue-400">Build Together.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">Rent professional equipment from trusted nearby shops without the cost of buying it for one project.</p><div className="mt-8 flex flex-wrap gap-3"><button onClick={()=>nav("categories")} className="rounded-xl bg-blue-500 px-5 py-3.5 font-bold">Find My Tool</button><button onClick={()=>nav("categories")} className="rounded-xl border border-slate-600 px-5 py-3.5 font-bold">Browse Categories</button><button onClick={()=>nav("categories")} className="flex items-center gap-2 rounded-xl border border-slate-600 px-5 py-3.5 font-bold"><LocateFixed size={18}/> Find Near Me</button></div></div><div className="rounded-3xl border border-white/10 bg-white/8 p-5 shadow-2xl backdrop-blur"><div className="rounded-2xl bg-white p-5 text-slate-900"><p className="mb-3 font-bold">What tool do you need?</p><div className="flex items-center gap-3 rounded-xl border-2 border-blue-100 bg-slate-50 px-4"><Search className="text-blue-600"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Try “wall drilling” or “Bosch”" className="h-14 min-w-0 flex-1 bg-transparent outline-none"/><button onClick={()=>nav("categories")} className="rounded-lg bg-blue-600 px-4 py-2 font-bold text-white">Search</button></div><div className="mt-5 grid grid-cols-3 gap-3 text-center"><Stat n="10" label="Categories"/><Stat n="50" label="Local shops"/><Stat n="₹250" label="Estimated from / day"/></div></div></div></div></section>
+      <section className="hero-grid overflow-hidden bg-slate-950 text-white"><div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-24"><div><span className="mb-5 inline-flex rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">Professional tools. Local pickup. Fair daily prices.</span><h1 className="text-5xl font-black leading-[1.03] tracking-tight sm:text-6xl">Borrow Tools.<br/><span className="text-blue-400">Build Together.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">Rent professional equipment from trusted nearby shops without the cost of buying it for one project.</p><div className="mt-8 flex flex-wrap gap-3"><button onClick={()=>nav("categories")} className="rounded-xl bg-blue-500 px-5 py-3.5 font-bold">Find My Tool</button><button onClick={()=>nav("categories")} className="rounded-xl border border-slate-600 px-5 py-3.5 font-bold">Browse Categories</button><button onClick={()=>nav("categories")} className="flex items-center gap-2 rounded-xl border border-slate-600 px-5 py-3.5 font-bold"><LocateFixed size={18}/> Find Near Me</button></div></div><div className="rounded-3xl border border-white/10 bg-white/8 p-5 shadow-2xl backdrop-blur"><div className="rounded-2xl bg-white p-5 text-slate-900"><p className="mb-3 font-bold">What tool do you need?</p><div className="flex items-center gap-3 rounded-xl border-2 border-blue-100 bg-slate-50 px-4"><Search className="text-blue-600"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Try “wall drilling” or “Bosch”" className="h-14 min-w-0 flex-1 bg-transparent outline-none"/><button onClick={()=>nav("categories")} className="rounded-lg bg-blue-600 px-4 py-2 font-bold text-white">Search</button></div><div className="mt-5 grid grid-cols-3 gap-3 text-center"><Stat n="10" label="Categories"/><Stat n="50" label="Local shops"/><Stat n="₹200" label="Estimated from / day"/></div></div></div></div></section>
       <section id="categories" className="scroll-mt-24 py-18"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="mb-9 flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><p className="eyebrow">EQUIPMENT DIRECTORY</p><h2 className="section-title">Browse by Category</h2><p className="mt-2 text-slate-600">Select a category to view professional tool options and local availability.</p></div><span className="text-sm font-semibold text-slate-500">{filtered.length} categories</span></div><div className="grid gap-7 md:grid-cols-2">{filtered.map(c=><button key={c.slug} onClick={()=>{setSelectedCategory(c);setView("subcategories");scrollTo(0,0)}} className="category-card group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><div className="overflow-hidden"><img src={c.image} alt={c.name} className="h-[260px] w-full object-cover transition duration-300 group-hover:scale-[1.04]"/></div><div className="flex items-center justify-between gap-5 p-6"><div><h3 className="text-xl font-extrabold">{c.name}</h3><p className="mt-1.5 text-[15px] leading-6 text-slate-600">{c.description}</p></div><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-700"><ArrowRight size={20}/></span></div></button>)}</div></div></section>
       <section id="about" className="scroll-mt-20 bg-slate-50 py-18"><div className="mx-auto max-w-7xl px-5 lg:px-8"><p className="eyebrow">OUR PURPOSE</p><h2 className="section-title">About Toolnest</h2><p className="mt-5 max-w-4xl text-lg leading-8 text-slate-600">Toolnest is a local tool rental marketplace created to make professional tools more accessible and affordable. Instead of buying expensive equipment for one-time or short-term use, customers can browse tool categories, find nearby rental shops, check availability, and reserve tools online. Toolnest helps homeowners, workers, contractors, technicians and small businesses get the right equipment when they need it while reducing the cost of purchasing rarely used tools.</p><div className="mt-10 grid gap-5 md:grid-cols-3"><Feature icon={<CalendarDays/>} title="Affordable Daily Rentals" text="Pay only for the days you need."/><Feature icon={<MapPin/>} title="Nearby Tool Shops" text="Compare trusted local partners."/><Feature icon={<CheckCircle2/>} title="Easy Booking & Pickup" text="Reserve online and collect locally."/></div></div></section>
       <section id="how" className="scroll-mt-20 py-18"><div className="mx-auto max-w-7xl px-5 lg:px-8"><p className="eyebrow">SIMPLE LOCAL RENTAL</p><h2 className="section-title">How It Works</h2><div className="mt-10 grid gap-5 md:grid-cols-4">{[["01","Find a Tool","Browse professional equipment."],["02","Choose Nearby Shop","Compare distance, price and rating."],["03","Select Rental Dates","Choose available days and pickup time."],["04","Pick Up & Return","Collect locally and return after use."]].map(x=><div key={x[0]} className="rounded-2xl border border-slate-200 p-6"><span className="text-sm font-black text-blue-600">{x[0]}</span><h3 className="mt-5 text-lg font-extrabold">{x[1]}</h3><p className="mt-2 text-slate-600">{x[2]}</p></div>)}</div></div></section>
