@@ -18,19 +18,19 @@ const categories: Category[] = [
 ];
 type Tool = { name:string; brand:string; model:string; spec:string; price:number; deposit:number; shops:number; image:string };
 const equipmentNames: Record<string,string[]> = {
-  "Drilling & Breaking":["Bosch Demolition Hammer","Makita Rotary Hammer","Hilti Core Drilling Machine"], "Cutting & Sawing":["DeWalt Circular Saw","Makita Cut-Off Saw","Bosch Reciprocating Saw"], "Grinding & Sanding":["Bosch Angle Grinder","Makita Belt Sander","DeWalt Concrete Grinder"], "Woodworking":["Makita Electric Planer","Bosch Wood Router","DeWalt Biscuit Jointer"], "Heavy-Duty Power Tools":["Hilti Breaker TE 3000","Bosch Magnetic Drill","Makita Impact Wrench"],
-  "Concrete Equipment":["Ajax Concrete Mixer","Wacker Concrete Vibrator","Hilti Concrete Scarifier"], "Compaction Equipment":["Wacker Plate Compactor","Honda Tamping Rammer","JCB Walk-Behind Roller"], "Cutting Equipment":["Husqvarna Concrete Cutter","Stihl Cut-Off Machine","Hilti Wall Saw"], "Lifting Equipment":["Hydraulic Material Lift","Electric Chain Hoist","Manual Pallet Stacker"], "Site Equipment":["Portable Site Generator","LED Site Light Tower","Industrial Dewatering Pump"],
-  "Lawn Equipment":["Honda Petrol Lawn Mower","Bosch Electric Lawn Mower","Ride-On Lawn Tractor"], "Tree Cutting":["Stihl Petrol Chainsaw","Husqvarna Pole Saw","Makita Electric Chainsaw"], "Hedge & Garden Cutting":["Bosch Hedge Trimmer","Stihl Brush Cutter","Makita Grass Trimmer"], "Spraying Equipment":["Honda Power Sprayer","Kisan Battery Sprayer","Stihl Mist Blower"], "Soil & Digging Equipment":["Honda Earth Auger","Power Tiller Cultivator","Mini Trencher Machine"],
-  "Pressure Washers":["Kärcher HD Pressure Washer","Bosch Professional Washer","Nilfisk Hot Water Washer"], "Industrial Vacuums":["Kärcher Wet & Dry Vacuum","Bosch Dust Extractor","Nilfisk Industrial Vacuum"], "Floor Cleaning Machines":["Kärcher Scrubber Dryer","Taski Auto Scrubber","Nilfisk Ride-On Sweeper"], "Floor Polishers":["Taski Single Disc Polisher","Kärcher Floor Polisher","Roots High-Speed Burnisher"],
-  "Welding Machines":["Ador Inverter Welding Machine","ESAB MIG Welder","Rilon TIG Welding Machine"], "Cutting Machines":["ESAB Plasma Cutter","Ador Gas Cutting Set","Rilon CNC Plasma Cutter"], "Air Compressors":["Elgi Portable Air Compressor","Ingersoll Rand Compressor","Chicago Pneumatic Compressor"], "Fabrication Equipment":["Hydraulic Pipe Bender","Magnetic Drill Press","Industrial Bench Grinder"],
-  "Electrical Testers":["Fluke Digital Multimeter","Megger Insulation Tester","Kyoritsu Clamp Meter"], "Cable Testing":["Fluke Cable Analyzer","Megger Cable Fault Locator","Hioki Earth Tester"], "Laser Measurement":["Bosch Laser Distance Meter","Leica Rotary Laser Level","Hilti Multi-Line Laser"], "Professional Measuring Equipment":["Total Station Survey Instrument","Digital Theodolite","Thermal Imaging Camera"],
-  "Pipe Cutting":["Ridgid Pipe Cutter","Bosch Pipe Saw","Orbital Pipe Cutting Machine"], "Drain Cleaning":["Ridgid Drain Cleaning Machine","Kärcher Sewer Jetting Machine","Electric Drain Snake"], "Water Pumps":["Kirloskar Dewatering Pump","Honda Petrol Water Pump","Submersible Sludge Pump"], "Pipe Threading":["Ridgid Pipe Threading Machine","Rothenberger Threader","Portable Pipe Grooving Machine"], "Professional Plumbing Machines":["Hydraulic Pipe Bender","Pipe Freezing Machine","Drain Inspection Camera"],
-  "Paint Sprayers":["Bosch Professional Paint Sprayer","Wagner HVLP Sprayer","Graco Electric Sprayer"], "Airless Spray Machines":["Graco Airless Sprayer","Wagner Control Pro","Titan Impact Airless Sprayer"], "Surface Sanders":["Makita Orbital Sander","Bosch Belt Sander","Festool Random Orbit Sander"], "Wall Sanders":["Bosch Drywall Sander","Festool Planex Wall Sander","Makita Long-Reach Sander"], "Surface Preparation Equipment":["Concrete Shot Blaster","Floor Scarifier","Industrial Paint Stripper"],
-  "Circular Saws":["DeWalt Circular Saw","Makita Track Saw","Bosch Plunge Saw"], "Mitre Saws":["Bosch Sliding Mitre Saw","DeWalt Compound Mitre Saw","Makita Dual-Bevel Mitre Saw"], "Table Saws":["DeWalt Jobsite Table Saw","Bosch Professional Table Saw","Makita Contractor Table Saw"], "Planers":["Makita Thickness Planer","DeWalt Portable Planer","Bosch Electric Hand Planer"], "Routers":["Bosch Plunge Router","Makita Trim Router","DeWalt Variable-Speed Router"], "Professional Woodworking Machines":["Panel Saw Machine","Wood Spindle Moulder","Industrial Band Saw"],
-  "Heavy-Duty Ladders":["Industrial Extension Ladder","Aluminium Platform Ladder","Fibreglass Electrical Ladder"], "Material Handling":["Hydraulic Pallet Truck","Material Hoist","Heavy-Duty Hand Trolley"], "Site Safety Equipment":["Mobile Safety Barricade Set","Industrial Ventilation Blower","Portable Gas Detector"], "Specialised Machines":["Thermal Fogging Machine","Industrial Tile Stripper","Pipe Inspection Camera"]
+  "Drilling & Breaking":["Bosch Demolition Hammer","Makita Rotary Hammer","Hilti Core Drilling Machine","Bosch Cordless Drill Driver"], "Cutting & Sawing":["DeWalt Circular Saw","Makita Cut-Off Saw","Bosch Reciprocating Saw","Makita Jigsaw"], "Grinding & Sanding":["Bosch Angle Grinder","Makita Belt Sander","DeWalt Concrete Grinder"], "Woodworking":["Makita Electric Planer","Bosch Wood Router","DeWalt Biscuit Jointer"], "Heavy-Duty Power Tools":["Hilti Breaker TE 3000","Bosch Magnetic Drill","Makita Impact Wrench","DeWalt Cordless Impact Driver"],
+  "Concrete Equipment":["Ajax Concrete Mixer","Wacker Concrete Vibrator","Hilti Concrete Scarifier","Walk-Behind Concrete Power Trowel"], "Compaction Equipment":["Wacker Plate Compactor","Honda Tamping Rammer","JCB Walk-Behind Roller"], "Cutting Equipment":["Husqvarna Concrete Cutter","Stihl Cut-Off Machine","Hilti Wall Saw","Electric Tile Cutting Machine"], "Lifting Equipment":["Hydraulic Material Lift","Electric Chain Hoist","Manual Pallet Stacker"], "Site Equipment":["Portable Site Generator","LED Site Light Tower","Industrial Dewatering Pump","Portable Electric Cement Mortar Mixer"],
+  "Lawn Equipment":["Honda Petrol Lawn Mower","Bosch Electric Lawn Mower","Ride-On Lawn Tractor","Electric Lawn Scarifier"], "Tree Cutting":["Stihl Petrol Chainsaw","Husqvarna Pole Saw","Makita Electric Chainsaw","Garden Wood Chipper"], "Hedge & Garden Cutting":["Bosch Hedge Trimmer","Stihl Brush Cutter","Makita Grass Trimmer","Cordless Leaf Blower"], "Spraying Equipment":["Honda Power Sprayer","Kisan Battery Sprayer","Stihl Mist Blower"], "Soil & Digging Equipment":["Honda Earth Auger","Power Tiller Cultivator","Mini Trencher Machine"],
+  "Pressure Washers":["Kärcher HD Pressure Washer","Bosch Professional Washer","Nilfisk Hot Water Washer","Pressure Washer Surface Cleaner"], "Industrial Vacuums":["Kärcher Wet & Dry Vacuum","Bosch Dust Extractor","Nilfisk Industrial Vacuum","Carpet Upholstery Extractor"], "Floor Cleaning Machines":["Kärcher Scrubber Dryer","Taski Auto Scrubber","Nilfisk Ride-On Sweeper","Professional Steam Cleaner"], "Floor Polishers":["Taski Single Disc Polisher","Kärcher Floor Polisher","Roots High-Speed Burnisher"],
+  "Welding Machines":["Ador Inverter Welding Machine","ESAB MIG Welder","Rilon TIG Welding Machine","Portable Spot Welding Machine"], "Cutting Machines":["ESAB Plasma Cutter","Ador Gas Cutting Set","Rilon CNC Plasma Cutter"], "Air Compressors":["Elgi Portable Air Compressor","Ingersoll Rand Compressor","Chicago Pneumatic Compressor"], "Fabrication Equipment":["Hydraulic Pipe Bender","Magnetic Drill Press","Industrial Bench Grinder","Electric Sheet Metal Nibbler","Portable Metal Belt Linisher"],
+  "Electrical Testers":["Fluke Digital Multimeter","Megger Insulation Tester","Kyoritsu Clamp Meter","Digital Phase Sequence Meter"], "Cable Testing":["Fluke Cable Analyzer","Megger Cable Fault Locator","Hioki Earth Tester","Network Cable Continuity Tester"], "Laser Measurement":["Bosch Laser Distance Meter","Leica Rotary Laser Level","Hilti Multi-Line Laser"], "Professional Measuring Equipment":["Total Station Survey Instrument","Digital Theodolite","Thermal Imaging Camera","Digital Concrete Moisture Meter"],
+  "Pipe Cutting":["Ridgid Pipe Cutter","Bosch Pipe Saw","Orbital Pipe Cutting Machine","Cordless Plastic Pipe Shear"], "Drain Cleaning":["Ridgid Drain Cleaning Machine","Kärcher Sewer Jetting Machine","Electric Drain Snake"], "Water Pumps":["Kirloskar Dewatering Pump","Honda Petrol Water Pump","Submersible Sludge Pump"], "Pipe Threading":["Ridgid Pipe Threading Machine","Rothenberger Threader","Portable Pipe Grooving Machine"], "Professional Plumbing Machines":["Hydraulic Pipe Bender","Pipe Freezing Machine","Drain Inspection Camera","Manual Hydrostatic Pressure Test Pump","Hydraulic Pipe Crimping Tool"],
+  "Paint Sprayers":["Bosch Professional Paint Sprayer","Wagner HVLP Sprayer","Graco Electric Sprayer","Electric Paint Mixing Drill"], "Airless Spray Machines":["Graco Airless Sprayer","Wagner Control Pro","Titan Impact Airless Sprayer"], "Surface Sanders":["Makita Orbital Sander","Bosch Belt Sander","Festool Random Orbit Sander"], "Wall Sanders":["Bosch Drywall Sander","Festool Planex Wall Sander","Makita Long-Reach Sander"], "Surface Preparation Equipment":["Concrete Shot Blaster","Floor Scarifier","Industrial Paint Stripper","Hot Air Heat Gun","Handheld Electric Wallpaper Steamer"],
+  "Circular Saws":["DeWalt Circular Saw","Makita Track Saw","Bosch Plunge Saw"], "Mitre Saws":["Bosch Sliding Mitre Saw","DeWalt Compound Mitre Saw","Makita Dual-Bevel Mitre Saw"], "Table Saws":["DeWalt Jobsite Table Saw","Bosch Professional Table Saw","Makita Contractor Table Saw"], "Planers":["Makita Thickness Planer","DeWalt Portable Planer","Bosch Electric Hand Planer"], "Routers":["Bosch Plunge Router","Makita Trim Router","DeWalt Variable-Speed Router","Cordless Compact Palm Router"], "Professional Woodworking Machines":["Panel Saw Machine","Wood Spindle Moulder","Industrial Band Saw","Portable Oscillating Spindle Sander","Woodworking Biscuit Joiner"],
+  "Heavy-Duty Ladders":["Industrial Extension Ladder","Aluminium Platform Ladder","Fibreglass Electrical Ladder"], "Material Handling":["Hydraulic Pallet Truck","Material Hoist","Heavy-Duty Hand Trolley","Furniture Moving Dolly Set"], "Site Safety Equipment":["Mobile Safety Barricade Set","Industrial Ventilation Blower","Portable Gas Detector","Portable Industrial Air Scrubber"], "Specialised Machines":["Thermal Fogging Machine","Industrial Tile Stripper","Pipe Inspection Camera","Manual Tile Cutter"]
 };
 const categoryBrands: Record<string,string[]> = {"power-tools":["Bosch","Makita","Hilti"],construction:["Wacker","Honda","JCB"],gardening:["Honda","Stihl","Husqvarna"],cleaning:["Kärcher","Nilfisk","Taski"],welding:["ESAB","Ador","Rilon"],electrical:["Fluke","Megger","Bosch"],plumbing:["Ridgid","Rothenberger","Kirloskar"],painting:["Graco","Wagner","Bosch"],woodworking:["DeWalt","Makita","Bosch"],other:["Genie","Kärcher","Ridgid"]};
-function exactToolImage(name:string,index:number){ const host=["tse1","tse2","tse3"][index]; const query=encodeURIComponent(`${name} professional machine product`); return `https://${host}.mm.bing.net/th?q=${query}&w=900&h=600&c=7&rs=1&p=0`; }
+function exactToolImage(name:string,index:number){ const host=["tse1","tse2","tse3"][index%3]; const query=encodeURIComponent(`${name} professional machine product`); return `https://${host}.mm.bing.net/th?q=${query}&w=900&h=600&c=7&rs=1&p=0`; }
 // Budget presentation tariffs requested by the owner, not verified supplier quotes.
 // Each tuple is [daily INR, refundable deposit INR].
 // Reduced from the prior estimates; actual heavy-equipment hire may cost more.
@@ -48,6 +48,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1550,
       2000
+    ],
+    [
+      300,
+      500
     ]
   ],
   "Cutting & Sawing": [
@@ -61,6 +65,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     ],
     [
       500,
+      500
+    ],
+    [
+      350,
       500
     ]
   ],
@@ -104,6 +112,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       500,
       500
+    ],
+    [
+      400,
+      1000
     ]
   ],
   "Concrete Equipment": [
@@ -117,6 +129,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     ],
     [
       1750,
+      2000
+    ],
+    [
+      1500,
       2000
     ]
   ],
@@ -146,6 +162,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       3000,
       3000
+    ],
+    [
+      550,
+      1000
     ]
   ],
   "Lifting Equipment": [
@@ -174,6 +194,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1250,
       1500
+    ],
+    [
+      500,
+      1000
     ]
   ],
   "Lawn Equipment": [
@@ -188,6 +212,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       2250,
       2500
+    ],
+    [
+      600,
+      1000
     ]
   ],
   "Tree Cutting": [
@@ -202,6 +230,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       500,
       500
+    ],
+    [
+      1600,
+      2000
     ]
   ],
   "Hedge & Garden Cutting": [
@@ -215,6 +247,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     ],
     [
       450,
+      500
+    ],
+    [
+      350,
       500
     ]
   ],
@@ -258,6 +294,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1750,
       2000
+    ],
+    [
+      450,
+      500
     ]
   ],
   "Industrial Vacuums": [
@@ -272,6 +312,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1250,
       1500
+    ],
+    [
+      800,
+      1000
     ]
   ],
   "Floor Cleaning Machines": [
@@ -286,6 +330,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       3250,
       3500
+    ],
+    [
+      650,
+      1000
     ]
   ],
   "Floor Polishers": [
@@ -313,6 +361,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     ],
     [
       1100,
+      1500
+    ],
+    [
+      800,
       1500
     ]
   ],
@@ -356,6 +408,14 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       350,
       500
+    ],
+    [
+      450,
+      1000
+    ],
+    [
+      650,
+      1000
     ]
   ],
   "Electrical Testers": [
@@ -369,6 +429,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     ],
     [
       400,
+      500
+    ],
+    [
+      250,
       500
     ]
   ],
@@ -384,6 +448,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1250,
       1500
+    ],
+    [
+      200,
+      500
     ]
   ],
   "Laser Measurement": [
@@ -412,6 +480,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       2100,
       2500
+    ],
+    [
+      350,
+      500
     ]
   ],
   "Pipe Cutting": [
@@ -426,6 +498,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       2250,
       2500
+    ],
+    [
+      300,
+      500
     ]
   ],
   "Drain Cleaning": [
@@ -482,6 +558,14 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1950,
       2000
+    ],
+    [
+      450,
+      1000
+    ],
+    [
+      700,
+      1000
     ]
   ],
   "Paint Sprayers": [
@@ -496,6 +580,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1000,
       1000
+    ],
+    [
+      300,
+      500
     ]
   ],
   "Airless Spray Machines": [
@@ -552,6 +640,14 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1550,
       2000
+    ],
+    [
+      200,
+      500
+    ],
+    [
+      350,
+      500
     ]
   ],
   "Circular Saws": [
@@ -622,6 +718,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       500,
       500
+    ],
+    [
+      350,
+      500
     ]
   ],
   "Professional Woodworking Machines": [
@@ -636,6 +736,14 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1750,
       2000
+    ],
+    [
+      650,
+      1000
+    ],
+    [
+      450,
+      1000
     ]
   ],
   "Heavy-Duty Ladders": [
@@ -664,6 +772,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       200,
       500
+    ],
+    [
+      250,
+      500
     ]
   ],
   "Site Safety Equipment": [
@@ -678,6 +790,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       850,
       1000
+    ],
+    [
+      1000,
+      1500
     ]
   ],
   "Specialised Machines": [
@@ -692,6 +808,10 @@ const rentalTariffs:Record<string,[number,number][]>={
     [
       1950,
       2000
+    ],
+    [
+      250,
+      500
     ]
   ]
 };
@@ -874,7 +994,7 @@ export default function Home() {
   const pricedShops=useMemo(()=>shops.map(shop=>quoteShop(shop,selectedTool)),[selectedTool]);
   const currentTools=useMemo(()=>toolsFor(selectedSub,selectedCategory),[selectedSub,selectedCategory]);
   const days=startDay&&endDay?endDay-startDay+1:0;
-  const filtered=useMemo(()=>categories.filter(c=>`${c.name} ${c.description} ${c.subs.join(" ")}`.toLowerCase().includes(search.toLowerCase())),[search]);
+  const filtered=useMemo(()=>categories.filter(c=>`${c.name} ${c.description} ${c.subs.join(" ")} ${c.subs.flatMap(sub=>equipmentNames[sub]??[]).join(" ")}`.toLowerCase().includes(search.toLowerCase())),[search]);
   const goHome=()=>{setView("home");scrollTo(0,0)};
   useEffect(()=>{
     setLoggedIn(localStorage.getItem("toolnest-demo-login")==="true");
