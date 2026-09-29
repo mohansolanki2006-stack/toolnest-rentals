@@ -3,12 +3,18 @@ import type { Booking, RentalMessage } from "../rental";
 
 // Only server routes import this module. Tokens are never exposed to the browser.
 export const key=(name:string)=>`toolnest:v1:${name}`;
-export function storageReady(){return Boolean(process.env.UPSTASH_REDIS_REST_URL&&process.env.UPSTASH_REDIS_REST_TOKEN);}
+function storageConfig(){
+  const url=process.env.UPSTASH_REDIS_REST_URL||process.env.STORAGE_KV_REST_API_URL;
+  const token=process.env.UPSTASH_REDIS_REST_TOKEN||process.env.STORAGE_KV_REST_API_TOKEN;
+  return {url,token};
+}
+export function storageReady(){const {url,token}=storageConfig();return Boolean(url&&token);}
 export class AppError extends Error { constructor(message:string,public status=400){super(message);} }
 export async function redis<T=unknown>(...command:(string|number)[]):Promise<T> {
-  if(!storageReady())throw new AppError("Account setup is not finished yet. Please try the presentation demo or contact the site owner.",503);
-  const response=await fetch(process.env.UPSTASH_REDIS_REST_URL!,{
-    method:"POST",headers:{Authorization:`Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,"Content-Type":"application/json"},
+  const {url,token}=storageConfig();
+  if(!url||!token)throw new AppError("Account setup is not finished yet. Please try the presentation demo or contact the site owner.",503);
+  const response=await fetch(url,{
+    method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
     body:JSON.stringify(command),cache:"no-store",signal:AbortSignal.timeout(10000),
   });
   const data=await response.json() as {error?:string;result:T};

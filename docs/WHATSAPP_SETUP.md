@@ -6,7 +6,7 @@ The website now supports registration, mobile number + password login, customer-
 
 In the existing **toolnest-rentals** Vercel project, open **Storage → Create Database → Upstash Redis** and choose an appropriate plan. Connect the database to the project's Production environment. Creating a cloud resource requires the account owner's approval. This database contains accounts and rentals: enable persistence, disable eviction, and do not treat it as a disposable cache.
 
-Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Vercel Environment Variables. Depending on the integration's chosen prefix, you may need to map its values to these exact names. Do not expose them with `NEXT_PUBLIC_`.
+The Vercel integration with its default `STORAGE` prefix provides `STORAGE_KV_REST_API_URL` and `STORAGE_KV_REST_API_TOKEN` automatically; the app accepts these names. Alternatively set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Vercel Environment Variables. Do not expose any of these with `NEXT_PUBLIC_`.
 
 Set `TOOLNEST_STAFF_PASSWORD` and `CRON_SECRET` to different random secrets, at least 32 characters each. Set `LATE_FEE_PER_DAY=50`, or change it to the intended rate. Each booking stores its own fee rate so later setting changes do not change old agreements.
 
