@@ -4,7 +4,7 @@ import { AppError, allHash, enqueue, key, readHash, redis } from "./store";
 import { safeEqual } from "./auth";
 
 const templates={confirmed:"toolnest_order_confirmed",pickup:"toolnest_pickup_confirmed",reminder:"toolnest_return_reminder",overdue:"toolnest_overdue_notice"};
-export function whatsappReady(){return false; // WhatsApp integration paused; no messages are sent.}
+export function whatsappReady(){return false;} // WhatsApp integration paused; no messages are sent.
 export function lateFeeRate(){const rate=Number(process.env.LATE_FEE_PER_DAY??50);return Number.isSafeInteger(rate)&&rate>=0&&rate<=100000?rate:50;}
 export async function withBookingLock<T>(id:string,run:()=>Promise<T>):Promise<T>{
   const lock=key(`booking-lock:${id}`),token=randomUUID();
